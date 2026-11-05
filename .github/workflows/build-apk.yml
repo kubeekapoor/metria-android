@@ -132,7 +132,7 @@ jobs:
 
       - name: Publicar en el release del tag
         if: steps.check.outputs.signed == 'true'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist-apk/app-release.apk
           fail_on_unmatched_files: true
