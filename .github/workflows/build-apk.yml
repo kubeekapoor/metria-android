@@ -48,7 +48,7 @@ jobs:
           cache: gradle
 
       - name: Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           # La acción instala por defecto "tools", un paquete que ya no existe
           # en el SDK actual y hace fallar el job antes de compilar.
