@@ -53,6 +53,17 @@ Formato: `YYYY-MM-DD · área · cambio`.
 - `scripts/build.sh`: pruebas + compilación + copia del APK a `dist/`.
 - Workflow de GitHub Actions para APK debug y release firmado.
 
+### Repositorio público
+- Licencia **AGPL-3.0** (`LICENSE`) y campo `license` en `package.json`.
+- `SECURITY.md` con modelo de amenaza, alcance y canal privado de reporte.
+- `THIRD_PARTY_NOTICES.md` con las licencias de Capacitor, scrypt-js, esbuild,
+  Playwright, Gradle, AndroidX y Kotlin.
+- Dependabot semanal para npm, Gradle y GitHub Actions.
+- Plantilla de reporte de errores con aviso de no incluir datos financieros.
+- CI con permisos mínimos: `contents: read` por defecto y `contents: write` solo
+  en el job de publicación de tags.
+- Recomendación de no guardar la llave de firma en secrets de un repo público.
+
 ### Pendiente
 - Probar en un teléfono físico: selector de archivos, hoja de compartir, bloqueo
   al apagar pantalla y comportamiento con teclado/rotación.

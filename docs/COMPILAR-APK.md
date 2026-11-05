@@ -161,7 +161,15 @@ Para ver errores en tiempo real:
 - al publicar un tag `v*`.
 
 Siempre produce un **APK de depuración** como artefacto descargable. Si están
-configurados los secretos, también produce el **APK release firmado**.
+configurados los secretos, también produce el **APK release firmado** y, al
+publicar un tag `v*`, crea el GitHub Release con el APK adjunto.
+
+> **Recomendación para un repo público:** no guardes la llave de firma en los
+> secrets del repositorio. Es la identidad de actualización: si se filtra,
+> alguien podría publicar una actualización maliciosa. Compila el release en tu
+> equipo y súbelo manualmente a GitHub Releases. Si más adelante quieres CI
+> firmado, guarda los secretos en un **Environment** llamado `release` con
+> revisores requeridos, no a nivel de repositorio.
 
 ### Secretos para firma
 

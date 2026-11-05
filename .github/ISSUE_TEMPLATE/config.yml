@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Reportar una vulnerabilidad
+    url: https://github.com/kubeekapoor/metria-android/security/advisories/new
+    about: No publiques problemas de seguridad en un issue. Usa el reporte privado.

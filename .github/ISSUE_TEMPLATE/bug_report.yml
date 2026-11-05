@@ -1,0 +1,72 @@
+name: Reportar un error
+description: Algo no funciona en Metría Android.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **No incluyas datos financieros reales, contraseñas ni frases de
+        recuperación.** Usa montos y nombres inventados.
+
+        Si el problema es de seguridad, no lo publiques aquí: usa
+        [Security → Report a vulnerability](https://github.com/kubeekapoor/metria-android/security/advisories/new).
+
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: ¿Qué pasó?
+      description: Describe el problema y el resultado que esperabas.
+    validations:
+      required: true
+
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Pasos para reproducir
+      placeholder: |
+        1. Abrir Ajustes
+        2. Tocar Exportar
+        3. ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versión de Metría
+      description: Aparece en Ajustes → Acerca de.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Versión de Android y modelo
+      placeholder: "Android 15 · Pixel 8"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Acceso / contraseña / recuperación
+        - Movimientos y cuentas
+        - Reportes y resumen
+        - Respaldo / importar / exportar
+        - Bloqueo automático
+        - Interfaz / pantalla
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Capturas o registros
+      description: Opcional. Oculta montos, nombres y cualquier dato personal.
+    validations:
+      required: false

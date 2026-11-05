@@ -1,5 +1,8 @@
 # Metría para Android
 
+[![Build APK](https://github.com/kubeekapoor/metria-android/actions/workflows/build-apk.yml/badge.svg)](https://github.com/kubeekapoor/metria-android/actions/workflows/build-apk.yml)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+
 Aplicación Android de **Metría**, control de finanzas personales por flujo de caja.
 Usa la misma interfaz y las mismas reglas financieras que la versión de escritorio
 (Electron), con almacenamiento cifrado y respaldos compatibles entre ambas.
@@ -80,6 +83,9 @@ Detalle paso a paso en [`docs/COMPILAR-APK.md`](docs/COMPILAR-APK.md).
 `.github/workflows/build-apk.yml` compila el APK en cada push o manualmente.
 Genera un APK de depuración siempre y, si existen los secretos de firma, también
 el de versión final. Ver el documento de compilación.
+
+Para un repositorio público se recomienda **no** guardar la llave de firma en
+GitHub: compila el release localmente y adjúntalo a un GitHub Release.
 
 ## Arquitectura
 
@@ -172,4 +178,13 @@ desbloqueo y recuperación.
 
 ## Licencia
 
-UNLICENSED · © Kubee Kapoor. Proyecto privado.
+Este proyecto se distribuye bajo la **GNU Affero General Public License v3.0**
+(AGPL-3.0). Puedes usarlo, estudiarlo, modificarlo y redistribuirlo bajo los
+términos de esa licencia; si ofreces una versión modificada como servicio en red,
+también debes publicar su código. Consulta [`LICENSE`](LICENSE).
+
+© Kubee Kapoor. La aplicación de escritorio es un proyecto separado y conserva
+sus propios términos.
+
+Las dependencias de terceros mantienen sus licencias originales; ver
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
