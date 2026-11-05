@@ -14,7 +14,7 @@ automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
 | A4 | Respaldos automáticos (15) y copia previa a importar (5) | En revisión | Rotación y deduplicación probadas |
 | A5 | Escritura atómica y recuperación ante rename fallido | En revisión | Probado con adaptador simulado |
 | A6 | Bloqueo por inactividad y al pasar a segundo plano | En revisión | Lógica y visibilitychange probados; falta pantalla apagada real |
-| A7 | `allowBackup=false`, sin INTERNET, sin tráfico claro | Hecho | Verificado en el manifiesto del APK |
+| A7 | `allowBackup=false`, sin transferencia D2D, sin INTERNET, sin tráfico claro | Hecho | Verificado en el manifiesto del APK |
 
 ## Funciones financieras (heredadas del escritorio)
 

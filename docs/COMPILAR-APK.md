@@ -117,7 +117,8 @@ una instalación existente.
   dist/metria-1.0.0-android.apk | grep -E "allowBackup|Cleartext|permission|versionName"
 ```
 
-Debe mostrar `allowBackup="false"`, `usesCleartextTraffic="false"` y ningún
+Debe mostrar `allowBackup="false"`, `fullBackupContent="false"`,
+`dataExtractionRules`, `usesCleartextTraffic="false"` y ningún
 `android.permission.INTERNET`.
 
 ## 5. Instalar en el teléfono

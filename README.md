@@ -125,7 +125,8 @@ de la app (requiere acceso root o `adb backup`; lo normal es usar el respaldo).
 
 ## Seguridad
 
-- `allowBackup=false` y sin permiso de INTERNET.
+- `allowBackup=false`, transferencia entre dispositivos excluida y sin permiso
+  de INTERNET.
 - Datos en el almacenamiento privado de la app (`Directory.Data`), cifrados en
   disco; la llave maestra solo vive en memoria.
 - Bloqueo por inactividad y al pasar a segundo plano; al bloquear se recarga la

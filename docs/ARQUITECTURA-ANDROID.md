@@ -147,7 +147,7 @@ git y se regenera en cada compilación.
 
 | Riesgo | Decisión |
 |---|---|
-| Copia de seguridad del sistema filtrando datos | `allowBackup=false` |
+| Copia de seguridad del sistema filtrando datos | `allowBackup=false`, `fullBackupContent=false` y `dataExtractionRules` que excluyen nube y transferencia entre dispositivos |
 | Tráfico de red | Sin permiso `INTERNET`; `usesCleartextTraffic=false` |
 | Datos en claro en disco | Archivo cifrado; llave solo en memoria |
 | Capturas/segundo plano | Bloqueo al salir; recarga al bloquear |

@@ -33,8 +33,9 @@ Formato: `YYYY-MM-DD · área · cambio`.
 ### Android
 - App ID `com.kubeekapoor.metria`, `versionName 1.0.0`, `minSdk 24`,
   `targetSdk 36`.
-- Manifiesto endurecido: `allowBackup=false`, `usesCleartextTraffic=false`, sin
-  permiso de INTERNET.
+- Manifiesto endurecido: `allowBackup=false`, `fullBackupContent=false`,
+  `dataExtractionRules` (excluye nube y transferencia entre dispositivos),
+  `usesCleartextTraffic=false` y sin permiso de INTERNET.
 - Íconos adaptativos y splash provisionales a partir de `resources-icon.png`.
 - Firma release con `~/.metria-keys/metria-release.jks` y
   `android/keystore.properties` (ambos modo 600).
