@@ -49,9 +49,15 @@ jobs:
 
       - name: Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          # La acción instala por defecto "tools", un paquete que ya no existe
+          # en el SDK actual y hace fallar el job antes de compilar.
+          packages: platform-tools
 
       - name: Instalar platform 36
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Empaquetar web y sincronizar
         run: |
