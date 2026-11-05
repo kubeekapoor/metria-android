@@ -146,6 +146,10 @@ android/keystore.properties              (contraseñas; modo 600)
 existente: habría que desinstalar y reinstalar (perdiendo los datos locales, que
 se recuperan desde un respaldo).
 
+Para una versión nueva, sube `versionCode` y `versionName` en
+`android/app/build.gradle` antes de compilar; Android no instala un APK con un
+`versionCode` igual o menor sobre el existente.
+
 Para publicar en GitHub sin subir la llave, configura estos secretos:
 
 | Secreto | Contenido |

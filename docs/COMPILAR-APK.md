@@ -103,6 +103,20 @@ Guarda la contraseña en `android/keystore.properties` (modo 600) y **respalda
 ambos archivos**. Sin la misma llave no se pueden publicar actualizaciones sobre
 una instalación existente.
 
+### Publicar una actualización
+
+Antes de compilar una versión nueva, sube ambos números en
+`android/app/build.gradle`:
+
+```gradle
+versionCode 2          // entero; Android lo usa para decidir si actualiza
+versionName "1.0.1"    // el que ve el usuario
+```
+
+Android rechaza instalar un APK con el mismo `versionCode` o menor sobre uno ya
+instalado. Actualiza también `APP_VERSION` en `src/core/platform.js` si cambia la
+versión visible.
+
 ### Verificar la firma
 
 ```bash
