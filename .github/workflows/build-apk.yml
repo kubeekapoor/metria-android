@@ -71,7 +71,7 @@ jobs:
         run: cd android && ./gradlew assembleDebug --no-daemon
 
       - name: Subir APK de depuración
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: metria-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
@@ -98,7 +98,7 @@ jobs:
 
       - name: Subir APK release
         if: env.HAS_KEYSTORE == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: metria-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
