@@ -58,7 +58,7 @@ firmarse con la misma llave**; consérvala (ver más abajo).
 
 ```bash
 npm install
-npm test                       # 11 pruebas de núcleo y compatibilidad
+npm test                       # 12 pruebas de núcleo y compatibilidad
 npm run build:web              # empaqueta src/core -> www/dist/boot.js
 npm run sync                   # copia www/ al proyecto Android
 npm run build:apk              # Gradle: APK release
@@ -158,7 +158,7 @@ Para publicar en GitHub sin subir la llave, configura estos secretos:
 ## Pruebas
 
 ```bash
-npm test              # 11 pruebas (crypto, bóveda, auth, respaldos, adaptador)
+npm test              # 12 pruebas (crypto, bóveda, auth, respaldos, adaptador, escritura atómica)
 npm run test:ui       # humo de interfaz en Brave/Chromium (requiere puerto 8765)
 ```
 

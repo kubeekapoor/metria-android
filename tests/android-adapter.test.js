@@ -95,3 +95,19 @@ test('plataforma: guardar respaldo usa caché y hoja de compartir', async () => 
   platform.endExternalActivity();
   assert.equal(platform.isExternalActivity(), false);
 });
+
+test('escritura atómica: si el segundo rename también falla, restaura el archivo anterior', async () => {
+  const files = new Map([['data-store.json', '{"viejo":1}']]);
+  const store = {
+    async exists(p) { return files.has(p); },
+    async readText(p) { if (!files.has(p)) throw new Error('ENOENT'); return files.get(p); },
+    async writeText(p, d) { files.set(p, String(d)); },
+    async remove(p) { files.delete(p); },
+    async rename() { throw new Error('EIO'); },
+    async list() { return []; },
+    async mkdir() {},
+  };
+  setFileStore(store);
+  await assert.rejects(() => vault.writeAtomic('{"nuevo":1}'), /EIO/);
+  assert.equal(files.get('data-store.json'), '{"viejo":1}', 'el archivo anterior no debe perderse');
+});

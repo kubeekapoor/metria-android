@@ -38,7 +38,7 @@ Ocupa ~1,5 GB. Es idempotente: si ya existe, no vuelve a descargar.
 
 Hace, en orden:
 
-1. `npm test` (11 pruebas).
+1. `npm test` (12 pruebas).
 2. `npm run build:apk`:
    - `esbuild src/core/boot.js → www/dist/boot.js`
    - `cap sync android` (copia `www/` y registra plugins)

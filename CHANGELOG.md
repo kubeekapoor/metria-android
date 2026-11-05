@@ -42,10 +42,11 @@ Formato: `YYYY-MM-DD · área · cambio`.
 - APK release generado: `dist/metria-1.0.0-android.apk` (3,7 MB).
 
 ### Pruebas y herramientas
-- 11 pruebas automatizadas: compatibilidad de crypto con Node/escritorio,
+- 12 pruebas automatizadas: compatibilidad de crypto con Node/escritorio,
   apertura de archivos del escritorio, flujo completo de auth, respaldos
   bidireccionales, rotación de respaldos, archivo dañado, adaptador Capacitor,
-  escritura atómica y guardar/compartir.
+  escritura atómica (incluida la restauración si el renombrado falla dos veces)
+  y guardar/compartir.
 - Prueba de humo de interfaz con Playwright + Brave: crear cuenta, frase, carga
   de la app, contraseña incorrecta, desbloqueo y recuperación.
 - `scripts/setup-toolchain.sh`: instala JDK 21 y Android SDK 36 sin sudo.

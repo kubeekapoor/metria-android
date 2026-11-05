@@ -54,10 +54,25 @@ export async function writeAtomic(text) {
   await fs.writeText(TMP_FILE, text);
   try {
     await fs.rename(TMP_FILE, DATA_FILE);
+    return;
   } catch {
-    /* Algunos sistemas no reemplazan al renombrar. Ventana mínima, solo en ese caso. */
-    await fs.remove(DATA_FILE);
-    await fs.rename(TMP_FILE, DATA_FILE);
+    /* Algunos sistemas no reemplazan al renombrar. Guardamos el archivo actual
+       en memoria para poder restaurarlo si el segundo intento también falla. */
+    let previous = null;
+    try {
+      if (await fs.exists(DATA_FILE)) previous = await fs.readText(DATA_FILE);
+    } catch {
+      previous = null;
+    }
+    try {
+      await fs.remove(DATA_FILE);
+      await fs.rename(TMP_FILE, DATA_FILE);
+    } catch (error) {
+      if (previous !== null) {
+        try { await fs.writeText(DATA_FILE, previous); } catch { /* último recurso */ }
+      }
+      throw error;
+    }
   }
 }
 
