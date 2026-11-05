@@ -1,0 +1,14 @@
+{
+  "appId": "com.kubeekapoor.metria",
+  "appName": "Metría",
+  "webDir": "www",
+  "loggingBehavior": "none",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

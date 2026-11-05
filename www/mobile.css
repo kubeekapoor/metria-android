@@ -1,0 +1,21 @@
+/* Ajustes exclusivos del WebView de Android.
+ * app.css viene del escritorio; aquí solo se compensan las barras del sistema
+ * (edge-to-edge en Android 15/16) sin tocar la composición original. */
+
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* La barra superior es sticky: al hacer scroll debe quedarse debajo de la
+   barra de estado, no encima de ella. */
+.navbar {
+  top: env(safe-area-inset-top, 0px);
+}
+
+#app {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+
+#app.has-tabs {
+  padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://localhost; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0B0B12">
+<link rel="icon" href="data:,">
+<title>Metría</title>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+  <!-- Pantalla de acceso (crear cuenta, desbloquear, recuperar). -->
+  <div id="auth"></div>
+
+  <!-- Interfaz financiera: se rellena solo después de desbloquear. -->
+  <div id="app" hidden></div>
+
+  <!-- scrypt-js: script clásico, expone window.scrypt (igual que en escritorio). -->
+  <script src="vendor/scrypt.js"></script>
+  <!-- Núcleo empaquetado con esbuild (incluye los plugins de Capacitor). -->
+  <script src="dist/boot.js"></script>
+</body>
+</html>
