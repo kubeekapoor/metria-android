@@ -60,27 +60,27 @@ body {
   margin-bottom: 14px;
 }
 
-h1 {
+#auth h1 {
   font-size: 21px;
   line-height: 1.25;
   margin: 0 0 6px;
 }
 
-p.sub {
+#auth p.sub {
   font-size: 13.5px;
   color: var(--auth-dim);
   margin: 0 0 18px;
   line-height: 1.5;
 }
 
-label {
+#auth label {
   display: block;
   font-size: 13px;
   color: #C9C9D3;
   margin: 14px 0 6px;
 }
 
-input {
+#auth input {
   width: 100%;
   min-height: 48px;
   padding: 12px 13px;
@@ -92,15 +92,15 @@ input {
   font-family: inherit;
 }
 
-input:focus {
+#auth input:focus {
   outline: none;
   border-color: var(--auth-accent);
   box-shadow: 0 0 0 2px rgba(67, 85, 129, 0.35);
 }
 
-input.mono, .recovery-box { font-family: var(--auth-mono); }
+#auth input.mono, #auth .recovery-box { font-family: var(--auth-mono); }
 
-button {
+#auth button {
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
@@ -109,7 +109,7 @@ button {
   cursor: pointer;
 }
 
-button.primary {
+#auth button.primary {
   width: 100%;
   margin-top: 20px;
   padding: 12px;
@@ -118,9 +118,9 @@ button.primary {
   color: var(--auth-accent-ink);
 }
 
-button.primary:disabled { opacity: 0.45; cursor: default; }
+#auth button.primary:disabled { opacity: 0.45; cursor: default; }
 
-.linkbtn {
+#auth .linkbtn {
   width: 100%;
   margin-top: 14px;
   padding: 8px;
@@ -131,7 +131,7 @@ button.primary:disabled { opacity: 0.45; cursor: default; }
   font-weight: 500;
 }
 
-.error {
+#auth .error {
   min-height: 20px;
   margin-top: 12px;
   font-size: 13px;
@@ -139,14 +139,14 @@ button.primary:disabled { opacity: 0.45; cursor: default; }
   color: var(--auth-danger);
 }
 
-.hint {
+#auth .hint {
   font-size: 11.5px;
   color: #6E6E78;
   margin: 16px 0 0;
   line-height: 1.5;
 }
 
-.recovery-box {
+#auth .recovery-box {
   margin-top: 4px;
   padding: 15px 14px;
   border: 1px solid var(--auth-line);
@@ -160,7 +160,7 @@ button.primary:disabled { opacity: 0.45; cursor: default; }
   line-height: 1.55;
 }
 
-.warn {
+#auth .warn {
   margin-top: 14px;
   padding: 11px 12px;
   border: 1px solid rgba(255, 159, 10, 0.3);
@@ -171,20 +171,20 @@ button.primary:disabled { opacity: 0.45; cursor: default; }
   line-height: 1.5;
 }
 
-.check-row {
+#auth .check-row {
   display: flex;
   align-items: flex-start;
   gap: 9px;
   margin-top: 16px;
 }
 
-.check-row input {
+#auth .check-row input {
   width: auto;
   min-height: 0;
   margin-top: 3px;
 }
 
-.check-row label {
+#auth .check-row label {
   margin: 0;
   font-size: 12.5px;
   color: #C9C9D3;

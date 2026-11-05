@@ -19,8 +19,9 @@ la puerta a que Android y escritorio calculen distinto. En cambio:
   `window.backup`, `window.security`, `window.appInfo`).
 
 Así hay **una sola fuente de verdad financiera** y el núcleo móvil queda aislado
-y documentado. Si algún día hace falta integración profunda con Android
-(Keystore, biometría, widgets), se puede sustituir un módulo del núcleo sin tocar
+y documentado. La biometría es el primer caso de integración profunda con
+Android: vive en un plugin local y el núcleo solo ve un puente mínimo
+(`biometric.js`). Lo mismo se puede hacer con widgets o notificaciones sin tocar
 `app.js`.
 
 ## 2. Capas
@@ -38,6 +39,7 @@ y documentado. Si algún día hace falta integración profunda con Android
 │  Puentes                             src/core/bridges.js       │
 ├──────────────────────────────────────────────────────────────┤
 │  Sesión y autenticación              src/core/auth.js          │
+│  Biometría                           src/core/biometric.js     │
 │  Bóveda y respaldos                  src/core/vault.js         │
 │  Cifrado                             src/core/crypto.js        │
 │  Archivos                            src/core/fs.js            │
@@ -50,8 +52,9 @@ y documentado. Si algún día hace falta integración profunda con Android
                             │
 ┌───────────────────────────▼──────────────────────────────────┐
 │  Capacitor (WebView + plugins)                                │
-│  Filesystem · Share · App                                     │
+│  Filesystem · Share · App · MetriaBiometric (local)           │
 │  Almacenamiento privado de la app (Directory.Data)            │
+│  Android Keystore (llave AES-256-GCM con biometría)           │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -78,9 +81,11 @@ y documentado. Si algún día hace falta integración profunda con Android
   envolturas de la llave maestra y `data`).
 - `writeAtomic()`: escribe `.tmp` y renombra; si el destino no se puede
   reemplazar, borra y renombra (ventana mínima).
+- `unlockWithMasterKey()`: abre el almacén con una llave maestra ya descifrada
+  (la que entrega la biometría). Valida que sea de 32 bytes y lanza `BAD_KEY`.
 - `makeStartupBackup()`: copia al arrancar, solo si el archivo cambió, máx. 15.
 - `snapshot()`: copia antes de importar, máx. 5.
-- Errores tipados: `WRONG_PASSWORD`, `WRONG_RECOVERY`, `CORRUPT`.
+- Errores tipados: `WRONG_PASSWORD`, `WRONG_RECOVERY`, `BAD_KEY`, `CORRUPT`.
 
 ### `auth.js`
 - Máquina de estados y llave maestra **solo en memoria**.
@@ -96,16 +101,39 @@ y documentado. Si algún día hace falta integración profunda con Android
      └──────────────────────────────┘
 
    locked ── unlock(password) ──► unlocked
+   locked ── unlockWithBiometric() ──► unlocked   (llave del Keystore)
    locked ── recover(phrase) ───► pendingNewPassword ── setNewPassword() ──► unlocked
 ```
 
 - Implementa el contrato `window.storage` (get/set/delete) con validación de
   clave y de sesión desbloqueada.
 - Guarda `autolock` dentro del mismo almacén cifrado.
+- Expone `biometricStatus()`, `enableBiometric()`, `disableBiometric()` y
+  `unlockWithBiometric()`. Al entrar con contraseña o frase avisa al plugin para
+  habilitar la biometría tras un reinicio.
+
+### `biometric.js`
+- Puente delgado con el plugin nativo `MetriaBiometric`; no guarda secretos.
+- `enroll(masterKey)` envía la llave maestra al Keystore para cifrarla;
+  `unlock()` recibe la llave descifrada y `noteUnlock()` marca el arranque actual.
+- En navegador (desarrollo y pruebas) devuelve “no disponible” sin lanzar
+  errores, para que el resto del núcleo funcione igual.
+
+### `MetriaBiometricPlugin.java`
+- Usa `androidx.biometric` con `BIOMETRIC_STRONG`.
+- Genera una llave AES-256-GCM en el Android Keystore con
+  `setUserAuthenticationRequired(true)` y `setInvalidatedByBiometricEnrollment(true)`.
+- Guarda en `SharedPreferences` el IV y el texto cifrado de la llave maestra; la
+  llave del Keystore nunca sale del sistema.
+- `Settings.Global.BOOT_COUNT` detecta reinicios: hasta que el usuario no entra
+  con contraseña o frase, `unlock()` responde `PASSWORD_REQUIRED`.
+- Se registra manualmente en `MainActivity` antes de `super.onCreate()`.
 
 ### `bridges.js`
 - Expone a `app.js` los cuatro objetos que esperaba de Electron.
 - `getAutoLock()` devuelve una **promesa** (la interfaz usa `.then`).
+- `window.security.biometric` ofrece `status`, `enable` y `disable`; `status`
+  funciona con la sesión bloqueada porque la pantalla de acceso lo necesita.
 - Validación de respaldos: formato `metria-backup`, versión 1 y parámetros scrypt
   exactos, para que un archivo ajeno no imponga un costo enorme.
 - Rechaza operaciones si la sesión no está desbloqueada.
@@ -113,8 +141,12 @@ y documentado. Si algún día hace falta integración profunda con Android
 ### `lock.js`
 - Temporizador de inactividad + `visibilitychange` + evento `appStateChange` de
   Capacitor.
-- `beginExternalActivity()` evita bloquear mientras el usuario está en el
-  selector de archivos o en la hoja de compartir.
+- Pasar a segundo plano **no** bloquea al instante: se respeta el ajuste
+  (1/5/15/30 min). Con 0 (“Nunca”) no se bloquea sola.
+- Al volver se comprueba el tiempo transcurrido porque Android puede pausar los
+  temporizadores mientras la app está oculta.
+- `beginExternalActivity()` evita contar como inactividad el tiempo que el
+  usuario pasa en el selector de archivos o en la hoja de compartir.
 - Al bloquear: `MetriaApp.shutdown()` limpia el DOM y `location.reload()` borra
   llave y datos descifrados de la memoria.
 
@@ -129,7 +161,8 @@ y documentado. Si algún día hace falta integración profunda con Android
    `share`) y espera el puente.
 2. Elige adaptador de archivos (Capacitor o localStorage).
 3. Hace el respaldo de arranque.
-4. Muestra crear cuenta o desbloquear.
+4. Consulta el estado biométrico y muestra crear cuenta o desbloquear (con
+   botón de huella/rostro si está activado y disponible).
 5. Solo al entrar carga `app.css`, `mobile.css` y `app.js`, arranca la interfaz y
    el bloqueo automático.
 
@@ -150,10 +183,13 @@ git y se regenera en cada compilación.
 | Copia de seguridad del sistema filtrando datos | `allowBackup=false`, `fullBackupContent=false` y `dataExtractionRules` que excluyen nube y transferencia entre dispositivos |
 | Tráfico de red | Sin permiso `INTERNET`; `usesCleartextTraffic=false` |
 | Datos en claro en disco | Archivo cifrado; llave solo en memoria |
-| Capturas/segundo plano | Bloqueo al salir; recarga al bloquear |
+| Capturas/segundo plano | Bloqueo tras el tiempo de inactividad configurado; recarga al bloquear |
+| Contraseña en el teléfono | No se guarda; la biometría cifra la llave maestra con el Keystore |
+| Biometría añadida o cambiada | `setInvalidatedByBiometricEnrollment(true)` invalida la llave y se pide contraseña |
+| Reinicio del teléfono | Se pide contraseña una vez (`BOOT_COUNT`); luego vuelve la biometría |
 | Archivos de otros apps | `Directory.Data` (privado) y hoja de compartir para exportar |
 | WebView con contenido remoto | CSP `default-src 'self'`; sin navegación externa |
-| Plugins de más | Solo App, Filesystem y Share |
+| Plugins de más | Solo App, Filesystem, Share y el plugin local de biometría |
 
 Nota: el WebView y el archivo cifrado protegen los datos en reposo, pero un
 teléfono con root podría volcar la memoria de la app desbloqueada. Es el mismo
@@ -217,17 +253,41 @@ mismo contrato. `app.js` y `bridges.js` no cambian.
 
 | Archivo | Qué cubre |
 |---|---|
-| `tests/core.test.js` | scrypt/AES compatibles, archivo de escritorio, flujo de auth, respaldos, corrupción |
+| `tests/core.test.js` | scrypt/AES compatibles, archivo de escritorio, flujo de auth, llave maestra/biometría, respaldos, corrupción |
 | `tests/android-adapter.test.js` | adaptador Capacitor, escritura atómica con fallo de rename, guardar/compartir |
 | `tests/ui-smoke.mjs` | crear cuenta, frase, carga de la app, contraseña mala/buena, recuperación |
 
 Lo que **no** cubren: plugins reales en un teléfono, hoja de compartir real,
-selector de archivos real y bloqueo del sistema. Eso está en `BACKLOG.md` como
-pendiente de prueba en dispositivo.
+selector de archivos real, `BiometricPrompt` y bloqueo del sistema. Eso está en
+`BACKLOG.md` como pendiente de prueba en dispositivo.
 
 ## 9. Limitaciones conocidas
 
 - Solo Android (no iOS) por ahora.
-- Sin biometría ni Keystore de Android; la contraseña maestra es el factor único.
+- La biometría requiere Android 7+ con huella/rostro y biometría fuerte; si el
+  teléfono solo ofrece biometría débil, la opción no aparece.
 - El APK de versión final está firmado con una llave local que debes respaldar.
 - La prueba en teléfono físico sigue pendiente.
+
+## 10. Flujo del desbloqueo biométrico
+
+```
+Ajustes → activar
+  auth.enableBiometric()
+    └─ biometric.enroll(masterKey)
+         └─ plugin: crea llave AES en Keystore (auth requerida)
+              BiometricPrompt → cifra masterKey → guarda IV + ciphertext
+
+Abrir la app (sesión bloqueada)
+  boot.js → auth.biometricStatus()
+    └─ plugin: supported / available / enabled / requiresPassword
+  AuthUI muestra el botón (o pide contraseña tras reiniciar)
+
+Tocar el botón (o auto-prompt)
+  auth.unlockWithBiometric()
+    └─ plugin: BiometricPrompt → descifra masterKey
+         └─ vault.unlockWithMasterKey(masterKey) → data-store.json
+              └─ adopt(): llave y datos solo en memoria
+```
+
+En ningún paso se escribe la contraseña ni la llave maestra en claro en disco.

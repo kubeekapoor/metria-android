@@ -2,6 +2,85 @@
 
 Formato: `YYYY-MM-DD · área · cambio`.
 
+## [1.1.0] — 2026-11-04
+
+### Desbloqueo biométrico
+- Plugin nativo `MetriaBiometric` + `androidx.biometric:biometric:1.1.0`.
+- La llave maestra se cifra con AES-256-GCM usando una llave del Android
+  Keystore que exige `BIOMETRIC_STRONG`; la contraseña nunca se guarda.
+- La llave se invalida si se inscribe una biometría nueva; Metría desactiva el
+  acceso y pide la contraseña.
+- Botón “Desbloquear con huella o rostro” en la pantalla de acceso y apertura
+  automática del diálogo al bloquear.
+- Ajuste “Usar huella o rostro para desbloquear” en Ajustes → Seguridad.
+- Tras reiniciar el teléfono se pide la contraseña una vez (se usa
+  `Settings.Global.BOOT_COUNT`); después la biometría vuelve a estar disponible.
+- Permisos normales `USE_BIOMETRIC` y `USE_FINGERPRINT` (máx. API 27). Sin
+  permiso de INTERNET.
+
+### Bloqueo al salir
+- Pasar a segundo plano ya **no** bloquea al instante: se respeta el ajuste de
+  inactividad (1/5/15/30 min).
+- Con “Nunca” (0) la app no se bloquea sola ni al salir.
+- Al volver se comprueba el tiempo transcurrido, porque Android puede pausar los
+  temporizadores en segundo plano.
+- Elegir un archivo o compartir un respaldo sigue sin contar como inactividad.
+
+### Autofill (Proton Pass y otros gestores)
+- Se quitó `autocomplete="off"` del formulario de acceso y se añadieron `name`,
+  `autocapitalize`, `autocorrect` y `spellcheck` a los campos.
+- La WebView usa `setImportantForAutofill(IMPORTANT_FOR_AUTOFILL_YES)` y
+  `setSaveFormData(true)` en `MainActivity`.
+- No se cambió el origen `https://localhost`; la asociación definitiva depende
+  del gestor de contraseñas.
+
+### Respuesta de la interfaz
+- Se restauró el contenedor de avisos `#toast`, que faltaba en `index.html`: cada
+  `showToast()` lanzaba un error y detenía el manejador **antes** de repintar.
+  Eso hacía que un botón pareciera no responder o que el cambio solo se viera al
+  salir y volver a entrar (guardar, agregar categoría/cuenta, biometría, etc.).
+- `showToast()` ahora crea el aviso si falta, de modo que un fallo de la interfaz
+  nunca interrumpe la acción que lo muestra.
+- Los estados asíncronos (bloqueo automático, biometría y versión) se actualizan
+  en el sitio en vez de repintar toda la vista, para no reemplazar un control
+  entre el toque y el clic.
+- El formulario de cuenta conserva lo escrito al elegir color o ícono; antes usaba
+  `oninput` inline que no podía ver el estado del IIFE y fallaba en cada tecla.
+- Un guardado fallido ya no deja la cola de escritura rechazada para siempre.
+- `tests/ui-smoke.mjs` comprueba con un solo toque tema, escala, bloqueo,
+  modales, alta de cuenta/categoría, confirmación, captura y reportes; además
+  valida que los círculos midan 28×28, que la franja del notch sea fija y opaca,
+  que Atrás cierre capas y vuelva de página, y que deslizar cambie de pestaña.
+
+### Pantalla y navegación
+- El área del notch queda siempre cubierta por una franja fija y opaca del color
+  del tema, incluso al desplazar el contenido; ya no se ve la app detrás de la
+  barra de estado.
+- Los íconos de las barras del sistema siguen el tema de la app mediante el
+  plugin integrado `SystemBars` de Capacitor; la pantalla de acceso usa íconos
+  claros sobre fondo oscuro.
+- Los círculos de color de las cuentas vuelven a ser círculos: las reglas
+  globales de `auth.css` (incluido `button { min-height:48px }`) quedaron
+  limitadas a `#auth` y ya no deforman los controles de la app.
+- El gesto o botón Atrás de Android cierra primero modales, hojas y desgloses;
+  después vuelve a Inicio o a la página anterior y, en Inicio, minimiza la app.
+- Se puede deslizar horizontalmente entre las pestañas principales (Inicio,
+  Reportes, Categorías y Ajustes) y hacia la derecha para volver desde una
+  subpágina. Los bordes de la pantalla se reservan para el gesto del sistema.
+
+### Versión y pruebas
+- `versionName 1.1.0`, `versionCode 2`.
+- 16 pruebas automatizadas: se añadió cobertura de `vault.unlockWithMasterKey`, del
+  flujo biométrico completo con un plugin simulado, del fallback cuando no hay
+  Android y del bloqueo al salir con temporizadores simulados (incluido “Nunca”).
+- Documentación actualizada (README, arquitectura, compilación, avisos de
+  terceros y seguridad).
+
+### Pendiente
+- Probar en un teléfono físico: activar biometría, desbloquear con huella,
+  cancelar y usar contraseña, invalidación al añadir una huella, autofill de
+  Proton Pass, bloqueo tras el tiempo configurado y exportar/importar respaldo.
+
 ## [1.0.0] — 2026-11-04
 
 ### Núcleo

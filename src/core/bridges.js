@@ -89,9 +89,34 @@ export function installBridges({ onActivity } = {}) {
       if (!auth.isUnlocked()) return DENIED;
       return auth.setAutoLock(minutes);
     },
+    /* La biometría se consulta también con la sesión bloqueada: la pantalla de
+       acceso necesita saber si debe ofrecer el botón de huella. */
+    biometric: {
+      status: () => auth.biometricStatus(),
+      enable: () => auth.enableBiometric(),
+      disable: () => auth.disableBiometric(),
+    },
   };
 
   window.appInfo = {
     version: () => platform.version(),
+  };
+
+  /* Barras del sistema: el tema de la app decide si los íconos de la barra de
+     estado son claros u oscuros. Se importa bajo demanda para que las pruebas
+     del núcleo puedan simular el puente nativo sin cargarlo antes de tiempo. */
+  window.systemBars = {
+    async setTheme(theme) {
+      const cap = globalThis.Capacitor;
+      if (!cap || typeof cap.isNativePlatform !== 'function' || !cap.isNativePlatform()) return false;
+      try {
+        const { SystemBars, SystemBarsStyle } = await import('@capacitor/core');
+        const style = theme === 'dark' ? SystemBarsStyle.Dark : SystemBarsStyle.Light;
+        await SystemBars.setStyle({ style });
+        return true;
+      } catch {
+        return false;
+      }
+    },
   };
 }

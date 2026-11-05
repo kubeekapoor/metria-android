@@ -10,6 +10,7 @@
 
 import * as vault from './vault.js';
 import * as crypto from './crypto.js';
+import * as biometric from './biometric.js';
 
 export const AUTOLOCK_OPTIONS = [0, 1, 5, 15, 30];
 export const AUTOLOCK_DEFAULT = 5;
@@ -46,6 +47,9 @@ export async function create(password, confirmPassword) {
   }
   const err = validateNewPassword(password, confirmPassword);
   if (err) return { ok: false, error: err };
+  /* Si quedó una inscripción biométrica de una cuenta anterior, se descarta:
+     la llave maestra nueva no tendría relación con ella. */
+  try { await biometric.disable(); } catch { /* sin biometría */ }
   try {
     pending = await vault.prepareNewStore(password);
     state = 'pendingRecoveryConfirm';
@@ -80,9 +84,58 @@ export async function unlock(password) {
   if (typeof password !== 'string' || !password) return { ok: false, error: 'Ingresa tu contraseña.' };
   try {
     adopt(await vault.unlockWithSecret('password', password));
+    biometric.noteUnlock().catch(() => {});
     return { ok: true };
   } catch (e) {
     return { ok: false, error: vault.authErrorMessage(e) };
+  }
+}
+
+/* ---------- desbloqueo biométrico ---------- */
+
+export async function biometricStatus() {
+  return biometric.status();
+}
+
+export async function enableBiometric() {
+  if (state !== 'unlocked' || !masterKey) {
+    return { ok: false, error: 'Abre tu cuenta para activar el desbloqueo biométrico.' };
+  }
+  return biometric.enroll(masterKey);
+}
+
+export async function disableBiometric() {
+  return biometric.disable();
+}
+
+/* La llave maestra llega cifrada desde el Keystore y se descifra con la
+ * biometría. No se guarda la contraseña en ningún momento. */
+export async function unlockWithBiometric() {
+  if (!(await vault.hasAccount())) return { ok: false, error: 'No hay datos que desbloquear.' };
+  const res = await biometric.unlock();
+  if (!res || !res.ok) {
+    return {
+      ok: false,
+      error: (res && res.error) || 'No se pudo desbloquear con biometría.',
+      code: res && res.code,
+    };
+  }
+
+  let key = null;
+  try {
+    key = biometric.fromBase64(res.key);
+    adopt(await vault.unlockWithMasterKey(key));
+    return { ok: true };
+  } catch (e) {
+    if (e && (e.code === 'BAD_KEY' || e.code === 'CORRUPT')) {
+      await biometric.disable().catch(() => {});
+    }
+    const message = e && e.code === 'CORRUPT'
+      ? 'La llave biométrica ya no corresponde a estos datos. Ingresa tu contraseña y vuelve a activarla.'
+      : vault.authErrorMessage(e);
+    return { ok: false, error: message, code: e && e.code };
+  } finally {
+    if (key) key.fill(0);
   }
 }
 
@@ -98,6 +151,7 @@ export async function recover(recoveryKey) {
     storeCache = unlocked.store;
     wrappers = unlocked.wrappers;
     state = 'pendingNewPassword';
+    biometric.noteUnlock().catch(() => {});
     return { ok: true, needsNewPassword: true };
   } catch (e) {
     return { ok: false, error: vault.authErrorMessage(e) };

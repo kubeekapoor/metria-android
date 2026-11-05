@@ -19,6 +19,7 @@ acompañan a cada paquete.
 | [Playwright](https://playwright.dev/) (`playwright-core`) | Apache-2.0 | Prueba de humo de la interfaz |
 | [Gradle](https://gradle.org/) | Apache-2.0 | Sistema de compilación |
 | [AndroidX](https://developer.android.com/jetpack/androidx) | Apache-2.0 | Bibliotecas de Android |
+| [AndroidX Biometric](https://developer.android.com/jetpack/androidx/releases/biometric) | Apache-2.0 | Diálogo de huella/rostro (`androidx.biometric:biometric`) |
 | [Kotlin](https://kotlinlang.org/) | Apache-2.0 | Runtime del proyecto Android |
 
 ## Trabajo original

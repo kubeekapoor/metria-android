@@ -2,20 +2,85 @@
  * app.css viene del escritorio; aquí solo se compensan las barras del sistema
  * (edge-to-edge en Android 15/16) sin tocar la composición original. */
 
+/* Capacitor 8 inyecta --safe-area-inset-* y, en WebView recientes, también
+ * existen las variables env(). Se toma el mayor para cubrir ambos casos. */
+:root {
+  --metria-top-inset: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --metria-bottom-inset: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  --metria-left-inset: max(env(safe-area-inset-left, 0px), var(--safe-area-inset-left, 0px));
+  --metria-right-inset: max(env(safe-area-inset-right, 0px), var(--safe-area-inset-right, 0px));
+}
+
 body {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: var(--metria-top-inset);
+  padding-left: var(--metria-left-inset);
+  padding-right: var(--metria-right-inset);
+}
+
+/* Al desplazarse, el contenido pasaba por debajo de la barra de estado
+ * transparente y se veía en el notch. Esta franja fija, opaca y del color del
+ * tema tapa siempre la zona del notch. */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--metria-top-inset);
+  background: var(--bg);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* En las pantallas con barra inferior, la propia barra cubre el área de gestos.
+ * En las demás, esta franja evita que el contenido se vea bajo el gesto. */
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--metria-bottom-inset);
+  background: var(--bg);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+body.has-tabs::after {
+  display: none;
 }
 
 /* La barra superior es sticky: al hacer scroll debe quedarse debajo de la
    barra de estado, no encima de ella. */
 .navbar {
-  top: env(safe-area-inset-top, 0px);
+  top: var(--metria-top-inset);
+}
+
+/* La barra inferior debe rellenar también el área del gesto de navegación. */
+.tabbar {
+  padding-bottom: calc(10px + var(--metria-bottom-inset));
 }
 
 #app {
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(80px + var(--metria-bottom-inset));
 }
 
 #app.has-tabs {
-  padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(150px + var(--metria-bottom-inset));
+}
+
+/* Los avisos deben quedar por encima de la barra inferior y de los modales,
+   y separados del borde para no quedar tapados por la barra de gestos. */
+.toast {
+  bottom: calc(96px + var(--metria-bottom-inset));
+  z-index: 200;
+}
+
+/* Un toque debe actuar de inmediato: sin el retardo del doble toque para hacer
+   zoom en botones, interruptores y controles. */
+button,
+select,
+input,
+.toggle-row {
+  touch-action: manipulation;
 }

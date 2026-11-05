@@ -112,6 +112,46 @@ test('un data-store.json del escritorio se abre en Android', async () => {
   );
 });
 
+test('desbloqueo con llave maestra (biometría) y rechazo de llave inválida', async () => {
+  const fs = freshStore();
+  globalThis.__fs = fs;
+
+  const pending = await vault.prepareNewStore('clave-biometrica');
+  await vault.writeStore({ tema: 'oscuro', autolock: '5' }, pending.masterKey, pending.wrappers);
+
+  const unlocked = await vault.unlockWithMasterKey(pending.masterKey);
+  assert.deepEqual(unlocked.store, { tema: 'oscuro', autolock: '5' });
+  assert.equal(crypto.toHex(unlocked.masterKey), crypto.toHex(pending.masterKey));
+
+  /* Borrar el búfer de entrada no debe destruir la llave de la sesión. */
+  const before = crypto.toHex(unlocked.masterKey);
+  pending.masterKey.fill(0);
+  assert.equal(crypto.toHex(unlocked.masterKey), before);
+  assert.notEqual(before, '00'.repeat(32));
+
+  await assert.rejects(
+    () => vault.unlockWithMasterKey(new Uint8Array(31)),
+    (e) => e.code === 'BAD_KEY',
+  );
+  await assert.rejects(
+    () => vault.unlockWithMasterKey(new Uint8Array(32)),
+    (e) => e.code === 'CORRUPT',
+  );
+});
+
+test('biometría no disponible en navegador no rompe el flujo', async () => {
+  const biometric = await import('../src/core/biometric.js');
+  const st = await biometric.status();
+  assert.equal(st.supported, false);
+  assert.equal(st.available, false);
+  assert.equal(st.enabled, false);
+  assert.equal((await biometric.enroll(new Uint8Array(32))).ok, false);
+  assert.equal((await biometric.unlock()).ok, false);
+  assert.equal((await biometric.disable()).ok, true);
+  assert.equal((await auth.biometricStatus()).supported, false);
+  assert.equal((await auth.enableBiometric()).ok, false);
+});
+
 test('flujo completo: crear, confirmar frase, guardar, bloquear, desbloquear y recuperar', async () => {
   const fs = freshStore();
   globalThis.__fs = fs;
@@ -204,4 +244,116 @@ test('rechaza un archivo dañado sin tocarlo', async () => {
     () => vault.unlockWithSecret('password', 'cualquiera'),
     (e) => e.code === 'CORRUPT',
   );
+});
+
+test('el bloqueo al salir respeta el tiempo de inactividad y "Nunca"', async (t) => {  const listeners = {};
+  globalThis.document = {
+    visibilityState: 'visible',
+    addEventListener(event, fn) { listeners[event] = fn; },
+    removeEventListener(event, fn) { if (listeners[event] === fn) delete listeners[event]; },
+  };
+  t.mock.timers.enable({ apis: ['setTimeout', 'Date'] });
+  const lock = await import('../src/core/lock.js');
+  t.after(() => {
+    lock.stopAutoLock();
+    t.mock.timers.reset();
+    delete globalThis.document;
+  });
+
+  const events = [];
+  let appCallback = null;
+  const app = {
+    addListener: async (_name, cb) => {
+      appCallback = cb;
+      return { remove: async () => {} };
+    },
+  };
+  const start = async (minutes) => {
+    lock.startAutoLock({ getMinutes: () => minutes, onLock: (r) => events.push(r), app });
+    await Promise.resolve();
+  };
+
+  /* 5 minutos: pasar a segundo plano no bloquea al instante. */
+  await start(5);
+  appCallback({ isActive: false });
+  assert.deepEqual(events, []);
+  t.mock.timers.tick(4 * 60 * 1000);
+  assert.deepEqual(events, []);
+  t.mock.timers.tick(2 * 60 * 1000);
+  assert.deepEqual(events, ['idle']);
+
+  /* Si el temporizador se pausó en segundo plano, al volver se comprueba el
+     tiempo transcurrido y se bloquea. */
+  events.length = 0;
+  await start(5);
+  appCallback({ isActive: false });
+  t.mock.timers.setTime(Date.now() + 6 * 60 * 1000);
+  appCallback({ isActive: true });
+  assert.deepEqual(events, ['system']);
+
+  /* 0 = Nunca: no bloquea al salir ni al dejar pasar el tiempo. */
+  events.length = 0;
+  await start(0);
+  appCallback({ isActive: false });
+  t.mock.timers.setTime(Date.now() + 60 * 60 * 1000);
+  appCallback({ isActive: true });
+  t.mock.timers.tick(60 * 60 * 1000);
+  assert.deepEqual(events, []);
+});
+
+test('flujo biométrico completo con un plugin simulado', async (t) => {
+  let storedKey = null;
+  const handlers = {
+    status: async () => ({
+      supported: true,
+      available: true,
+      enabled: storedKey !== null,
+      requiresPassword: false,
+      reason: 'OK',
+    }),
+    enroll: async ({ key }) => { storedKey = key; return { ok: true }; },
+    unlock: async () => (storedKey
+      ? { ok: true, key: storedKey }
+      : { ok: false, code: 'NOT_ENROLLED', error: 'No activado.' }),
+    disable: async () => { storedKey = null; return { ok: true }; },
+    noteUnlock: async () => ({ ok: true }),
+  };
+
+  /* Simula el puente nativo de Capacitor sin Android. */
+  globalThis.androidBridge = {};
+  globalThis.Capacitor = {
+    PluginHeaders: [{
+      name: 'MetriaBiometric',
+      methods: ['status', 'enroll', 'unlock', 'disable', 'noteUnlock']
+        .map(name => ({ name, rtype: 'promise' })),
+    }],
+    nativePromise: async (_plugin, method, options) => handlers[method](options || {}),
+  };
+  /* Inicializa Capacitor con el puente simulado antes de usar el plugin. */
+  await import('@capacitor/core');
+  t.after(() => {
+    delete globalThis.Capacitor;
+    delete globalThis.androidBridge;
+  });
+
+  const fs = freshStore();
+  globalThis.__fs = fs;
+  assert.equal((await auth.create('clave-biometrica', 'clave-biometrica')).ok, true);
+  assert.equal((await auth.confirmRecoverySaved()).ok, true);
+  await auth.storageSet('theme', 'dark');
+
+  assert.equal((await auth.biometricStatus()).enabled, false);
+  assert.equal((await auth.enableBiometric()).ok, true);
+  assert.equal((await auth.biometricStatus()).enabled, true);
+
+  auth.lock();
+  assert.equal((await auth.unlockWithBiometric()).ok, true);
+  assert.equal(auth.storageGet('theme').value, 'dark');
+
+  /* La llave de la sesión debe seguir sirviendo para escribir: si se borrara
+     al terminar el desbloqueo, este guardado rompería el archivo. */
+  await auth.storageSet('theme', 'claro');
+  auth.lock();
+  assert.equal((await auth.unlock('clave-biometrica')).ok, true);
+  assert.equal(auth.storageGet('theme').value, 'claro');
 });

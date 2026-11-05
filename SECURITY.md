@@ -25,7 +25,8 @@ Incluye, si puedes:
 En alcance:
 
 - derivación de llave, cifrado y formato de `data-store.json`;
-- autenticación, recuperación y bloqueo automático;
+- autenticación, recuperación, bloqueo automático y desbloqueo biométrico
+  (Android Keystore);
 - fuga de datos entre la app y el almacenamiento/otros procesos;
 - formato de respaldo `metria-backup` y su importación;
 - CSP, WebView y configuración del manifiesto;
@@ -43,6 +44,10 @@ Fuera de alcance:
 
 - Los datos se guardan cifrados con AES-256-GCM; la llave maestra se deriva con
   scrypt y solo vive en memoria mientras la sesión está desbloqueada.
+- El desbloqueo biométrico opcional no guarda la contraseña: cifra la llave
+  maestra con una llave AES-256-GCM del Android Keystore que exige huella/rostro.
+  Esa llave se invalida si se inscribe una biometría nueva y, tras un reinicio,
+  se pide la contraseña una vez.
 - La app no tiene permiso de INTERNET ni hace tráfico de red.
 - El respaldo automático y el manual están cifrados; el manual usa una
   contraseña propia.

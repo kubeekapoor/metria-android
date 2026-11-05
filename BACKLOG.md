@@ -1,4 +1,4 @@
-# Backlog — Metría Android 1.0.0
+# Backlog — Metría Android 1.1.0
 
 Estados: **Pendiente** · **En curso** · **En revisión** (probado de forma
 automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
@@ -13,7 +13,7 @@ automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
 | A3 | Formato `data-store.json` idéntico al escritorio | En revisión | Ida y vuelta probada |
 | A4 | Respaldos automáticos (15) y copia previa a importar (5) | En revisión | Rotación y deduplicación probadas |
 | A5 | Escritura atómica y recuperación ante rename fallido | En revisión | Probado con adaptador simulado |
-| A6 | Bloqueo por inactividad y al pasar a segundo plano | En revisión | Lógica y visibilitychange probados; falta pantalla apagada real |
+| A6 | Bloqueo por inactividad y al pasar a segundo plano | En revisión | Respeta el ajuste; 0 = Nunca. Probado con temporizadores simulados; falta pantalla apagada real |
 | A7 | `allowBackup=false`, sin transferencia D2D, sin INTERNET, sin tráfico claro | Hecho | Verificado en el manifiesto del APK |
 
 ## Funciones financieras (heredadas del escritorio)
@@ -48,8 +48,11 @@ automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
 | A10 | Íconos adaptativos y splash | Hecho | Provisionales |
 | A11 | Firma release y actualizaciones | Hecho | Llave en `~/.metria-keys` |
 | A12 | Build local reproducible | Hecho | `scripts/build.sh` |
+| A13 | Cada botón e interruptor responde con un solo toque | En revisión | Se restauró `#toast` y se evitan repintados asíncronos; probado en UI con toques simulados |
 | A13 | CI con GitHub Actions | Hecho | Debug siempre; release con secretos |
 | A14 | Instalar y probar en teléfono físico | **Pendiente** | Bloqueado: no hay dispositivo conectado |
+| A15 | Desbloqueo con huella/rostro (Keystore + `BIOMETRIC_STRONG`) | En revisión | Plugin nativo y UI listos; falta `BiometricPrompt` real |
+| A16 | Autofill para Proton Pass y otros gestores | En revisión | Atributos HTML y WebView listos; falta probar la asociación real |
 
 ## Prueba en dispositivo (checklist)
 
@@ -57,20 +60,26 @@ Al conectar un teléfono o instalar el APK:
 
 1. Crear cuenta, guardar frase y confirmar.
 2. Cerrar y abrir: debe pedir contraseña.
-3. Apagar la pantalla y volver: debe pedir contraseña.
+3. Apagar la pantalla y volver: debe pedir contraseña solo si se cumplió el
+   tiempo configurado (con “Nunca”, no).
 4. Esperar el tiempo de autobloqueo: debe pedir contraseña.
-5. Crear cuenta, ingreso, gasto, transferencia con comisión y abono.
-6. Exportar respaldo: debe abrir la hoja de compartir y guardar el `.json`.
-7. Importar ese respaldo: debe pedir la contraseña del respaldo y restaurar.
-8. Importar un respaldo exportado desde el escritorio.
-9. Abrir el `data-store.json` de Android en el escritorio (si se puede extraer).
-10. Rotar el teléfono y abrir el teclado en un formulario.
-11. Revisar que la barra inferior y los modales respeten las safe areas.
+5. Activar biometría en Ajustes; bloquear y desbloquear con huella/rostro.
+6. Cancelar el diálogo biométrico y entrar con contraseña.
+7. Reiniciar el teléfono: debe pedir contraseña una vez y luego permitir biometría.
+8. Agregar una huella nueva: la biometría debe desactivarse y pedir contraseña.
+9. Abrir un formulario de acceso con Proton Pass: debe ofrecer rellenar y, si se
+   elige “Use always”, conservar la asociación.
+10. Crear cuenta, ingreso, gasto, transferencia con comisión y abono.
+11. Exportar respaldo: debe abrir la hoja de compartir y guardar el `.json`.
+12. Importar ese respaldo: debe pedir la contraseña del respaldo y restaurar.
+13. Importar un respaldo exportado desde el escritorio.
+14. Abrir el `data-store.json` de Android en el escritorio (si se puede extraer).
+15. Rotar el teléfono y abrir el teclado en un formulario.
+16. Revisar que la barra inferior y los modales respeten las safe areas.
 
-## Mejoras futuras (no bloquean 1.0.0)
+## Mejoras futuras (no bloquean 1.1.0)
 
 - Ícono definitivo.
-- Biometría/Keystore de Android como desbloqueo opcional.
 - Exportar a CSV/PDF.
 - Widget de saldo.
 - Pruebas instrumentadas (Espresso) para el WebView.

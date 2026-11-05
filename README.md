@@ -8,9 +8,9 @@ Usa la misma interfaz y las mismas reglas financieras que la versión de escrito
 (Electron), con almacenamiento cifrado y respaldos compatibles entre ambas.
 
 - **Paquete:** `com.kubeekapoor.metria`
-- **Versión:** 1.0.0
+- **Versión:** 1.1.0
 - **Android mínimo:** 7.0 (API 24) · **objetivo:** Android 16 (API 36)
-- **APK de versión final:** `dist/metria-1.0.0-android.apk`
+- **APK de versión final:** `dist/metria-1.1.0-android.apk`
 
 ## Qué incluye
 
@@ -25,22 +25,57 @@ Paridad funcional con la ficha 1.0.0 del escritorio:
 - Respaldo manual cifrado (exportar/importar `.json`) y copia previa a importar.
 - Respaldos automáticos de arranque (últimos 15).
 - Modo claro/oscuro, tamaño de vista, aviso de duplicados.
-- Bloqueo automático por inactividad (1/5/15/30 min o nunca; por defecto 5) y
-  al salir de la app.
+- Bloqueo automático por inactividad (1/5/15/30 min o nunca; por defecto 5). El
+  mismo tiempo cuenta cuando la app pasa a segundo plano; con “Nunca” no se
+  bloquea sola.
+- Desbloqueo con huella o rostro (opcional), con contraseña y frase de
+  recuperación como respaldo.
 - "Borrar todos tus datos".
 
 Además, en Android:
 
 - Guardar respaldo abre la hoja de compartir del sistema (Archivos, Drive, correo…).
 - La app no pide permiso de INTERNET y no tiene tráfico en claro.
+- Campos de contraseña preparados para gestores como Proton Pass (atributos
+  estándar de autofill y WebView configurada para guardar formularios).
+
+## Desbloqueo con huella o rostro
+
+Se activa en **Ajustes → Seguridad → Desbloqueo rápido**. Requiere que el
+teléfono tenga una huella o rostro configurado y una biometría fuerte
+(`BIOMETRIC_STRONG`).
+
+- No se guarda la contraseña: se cifra la llave maestra con una llave AES-256-GCM
+  del Android Keystore que exige autenticación biométrica.
+- Si agregas una huella nueva o cambias la biometría, Android invalida esa llave.
+  Metría lo detecta, desactiva el acceso biométrico y pide la contraseña.
+- Después de reiniciar el teléfono se pide la contraseña una vez; luego la
+  biometría vuelve a funcionar durante ese arranque.
+- Si el teléfono solo tiene biometría débil, la opción no aparece.
+- La contraseña y la frase de recuperación siempre siguen disponibles.
+
+## Autofill con Proton Pass
+
+Metría es una WebView de Capacitor con origen `https://localhost`. El diálogo
+“Use login?” y la opción “Use always” son de Proton Pass, no de Metría.
+
+En 1.1.0 se prepararon los campos (`name`, `autocomplete`, atributos de
+contraseña) y la WebView (`IMPORTANT_FOR_AUTOFILL_YES` y
+`setSaveFormData(true)`) para que los gestores detecten el formulario. **No se
+cambió el hostname `localhost`.**
+
+Si Proton Pass sigue sin recordar “Use always”, la limitación está en cómo el
+gestor asocia WebViews con `localhost`; no hay una forma fiable de forzarlo desde
+Metría. La contraseña se puede seguir pegando o escribiendo, y el desbloqueo
+biométrico evita tener que hacerlo en cada apertura.
 
 > **Estado:** la lógica y la interfaz están probadas de forma automatizada. Falta
-> la prueba final en un teléfono físico (selector de archivos, hoja de compartir y
-> bloqueo real). Ver `BACKLOG.md`.
+> la prueba final en un teléfono físico (biometría, autofill, selector de
+> archivos, hoja de compartir y bloqueo real). Ver `BACKLOG.md`.
 
 ## Instalar el APK
 
-1. Copia `dist/metria-1.0.0-android.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/metria-1.1.0-android.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta "instalar apps de esta fuente" si Android lo pide.
 3. Al abrirlo por primera vez, crea tu contraseña maestra y guarda la frase de
    recuperación que te muestra.
@@ -61,7 +96,7 @@ firmarse con la misma llave**; consérvala (ver más abajo).
 
 ```bash
 npm install
-npm test                       # 12 pruebas de núcleo y compatibilidad
+npm test                       # 16 pruebas de núcleo y compatibilidad
 npm run build:web              # empaqueta src/core -> www/dist/boot.js
 npm run sync                   # copia www/ al proyecto Android
 npm run build:apk              # Gradle: APK release
@@ -95,6 +130,7 @@ src/core/        Núcleo móvil (JavaScript, sin interfaz)
   fs.js          Adaptadores: Capacitor, localStorage, memoria
   vault.js       Archivo cifrado, escritura atómica, respaldos
   auth.js        Estados de sesión y puente de almacenamiento
+  biometric.js   Puente con el plugin nativo de huella/rostro
   bridges.js     window.storage / backup / security / appInfo
   lock.js        Bloqueo por inactividad y segundo plano
   platform.js    Versión, guardar/compartir, actividad externa
@@ -110,6 +146,8 @@ www/             Interfaz (reutilizada del escritorio)
   vendor/        scrypt-js
 
 android/         Proyecto nativo Capacitor
+  app/.../MainActivity.java            Registro del plugin y autofill del WebView
+  app/.../MetriaBiometricPlugin.java   Keystore + BiometricPrompt
 tests/           Pruebas de núcleo, adaptador y humo de interfaz
 ```
 
@@ -135,9 +173,13 @@ de la app (requiere acceso root o `adb backup`; lo normal es usar el respaldo).
   de INTERNET.
 - Datos en el almacenamiento privado de la app (`Directory.Data`), cifrados en
   disco; la llave maestra solo vive en memoria.
-- Bloqueo por inactividad y al pasar a segundo plano; al bloquear se recarga la
-  página para borrar llave y datos descifrados.
-- CSP restrictiva y plugins mínimos (App, Filesystem, Share).
+- Bloqueo por inactividad y al pasar a segundo plano, respetando el tiempo
+  configurado; al bloquear se recarga la página para borrar llave y datos
+  descifrados.
+- Desbloqueo biométrico opcional: la llave maestra se cifra con una llave del
+  Android Keystore que exige huella/rostro; nunca se guarda la contraseña.
+- CSP restrictiva y plugins mínimos (App, Filesystem, Share y el plugin local de
+  biometría).
 
 ## Firma y actualizaciones
 
@@ -168,7 +210,7 @@ Para publicar en GitHub sin subir la llave, configura estos secretos:
 ## Pruebas
 
 ```bash
-npm test              # 12 pruebas (crypto, bóveda, auth, respaldos, adaptador, escritura atómica)
+npm test              # 16 pruebas (crypto, bóveda, auth, biometría, bloqueo, respaldos, adaptador, escritura atómica)
 npm run test:ui       # humo de interfaz en Brave/Chromium (requiere puerto 8765)
 ```
 

@@ -106,12 +106,39 @@ async function boot() {
 
   installBridges({ onActivity: ping });
 
+  /* La pantalla de acceso siempre es oscura: íconos claros en la barra de estado. */
+  if (window.systemBars) window.systemBars.setTheme('dark');
+
+  /* Gesto/botón Atrás de Android: cierra capas, vuelve de página o minimiza.
+     Sin este listener, Capacitor no hace nada cuando la web no tiene historial. */
+  if (Capacitor.isNativePlatform()) {
+    App.addListener('backButton', () => {
+      let handled = false;
+      try {
+        handled = !!(window.MetriaApp && typeof window.MetriaApp.handleBack === 'function'
+          && window.MetriaApp.handleBack());
+      } catch (e) {
+        console.error(e);
+      }
+      if (!handled) {
+        try { App.minimizeApp(); } catch { /* sin plugin nativo */ }
+      }
+    }).catch(() => {});
+  }
+
   let has = false;
   try {
     has = await auth.hasAccount();
     await vault.makeStartupBackup();
   } catch (e) {
     console.error(e);
+  }
+
+  /* El estado biométrico se consulta con la sesión bloqueada: solo indica si
+     hay una inscripción válida y si el teléfono puede autenticar. */
+  let biometric = { supported: false, available: false, enabled: false };
+  if (has) {
+    try { biometric = await auth.biometricStatus(); } catch (e) { console.error(e); }
   }
 
   ui = new AuthUI(authRoot, {
@@ -121,10 +148,11 @@ async function boot() {
     onRecover: (key) => auth.recover(key),
     onSetNewPassword: (password, confirm) => auth.setNewPassword(password, confirm),
     onConfirmRecovery: () => auth.confirmRecoverySaved(),
+    onBiometricUnlock: () => auth.unlockWithBiometric(),
     onEnterApp: enterApp,
   });
 
-  if (has) ui.showUnlock(lockReason());
+  if (has) ui.showUnlock(lockReason(), biometric);
   else ui.showCreate();
 }
 

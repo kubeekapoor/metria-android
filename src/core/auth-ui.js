@@ -9,7 +9,9 @@ export class AuthUI {
   constructor(root, handlers) {
     this.root = root;
     this.h = handlers;
-    this.version = handlers.version || '1.0.0';
+    this.version = handlers.version || '1.1.0';
+    this.lastBiometric = { enabled: false };
+    this.bioTimer = null;
   }
 
   setVersion(v) {
@@ -19,6 +21,8 @@ export class AuthUI {
   }
 
   shell(title, subtitle, body, footer = '') {
+    clearTimeout(this.bioTimer);
+    this.bioTimer = null;
     this.root.innerHTML = `
       <div class="auth-wrap">
         <div class="auth-card">
@@ -59,18 +63,27 @@ export class AuthUI {
     return res;
   }
 
-  showUnlock(reason = '') {
+  showUnlock(reason = '', biometric = this.lastBiometric || {}) {
+    this.lastBiometric = biometric;
     const why = reason === 'idle'
       ? 'Tu sesión se bloqueó por inactividad. '
       : reason === 'system'
         ? 'Tu sesión se bloqueó al salir de la app. '
         : '';
+    const canBio = !!(biometric && biometric.enabled && biometric.available !== false && !biometric.requiresPassword);
+    const bioBlock = canBio
+      ? `<button type="button" class="primary" data-biometric>Desbloquear con huella o rostro</button>
+         <p class="hint" style="text-align:center;margin:12px 0 0;">o usa tu contraseña</p>`
+      : '';
+    const passwordOnce = biometric && biometric.enabled && biometric.requiresPassword
+      ? `<p class="hint" style="margin:0 0 12px;">Después de reiniciar el teléfono, ingresa tu contraseña una vez. Luego podrás volver a usar la biometría.</p>`
+      : '';
     const { form, error } = this.shell(
       'Ingresa tu contraseña',
       `${why}Escribe tu contraseña maestra para abrir tus datos.`,
-      `<form id="f" autocomplete="off">
+      `${passwordOnce}${bioBlock}<form id="f" autocomplete="on">
         <label for="password">Contraseña</label>
-        <input type="password" id="password" autocomplete="current-password" required>
+        <input type="password" id="password" name="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
         <button type="submit" class="primary">Entrar</button>
       </form>`,
       `<button type="button" class="linkbtn" data-forgot>¿Olvidaste tu contraseña?</button>`,
@@ -83,6 +96,58 @@ export class AuthUI {
       if (res && res.ok) this.h.onEnterApp();
     });
     this.root.querySelector('[data-forgot]').addEventListener('click', () => this.showRecover());
+
+    const bioBtn = this.root.querySelector('[data-biometric]');
+    const tryBiometric = async () => {
+      if (!bioBtn || !this.h.onBiometricUnlock) return;
+      error.textContent = '';
+      const label = bioBtn.textContent;
+      bioBtn.disabled = true;
+      bioBtn.textContent = 'Esperando huella…';
+      let res;
+      try {
+        res = await this.h.onBiometricUnlock();
+      } catch (e) {
+        console.error(e);
+        res = { ok: false, error: 'No se pudo desbloquear con biometría.' };
+      }
+      if (res && res.ok) {
+        this.h.onEnterApp();
+        return;
+      }
+      bioBtn.disabled = false;
+      bioBtn.textContent = label;
+      if (res && res.code !== 'CANCELLED') {
+        error.textContent = (res && res.error) || 'No se pudo desbloquear con biometría.';
+      }
+      const input = form.querySelector('#password');
+      if (input) input.focus();
+    };
+    if (bioBtn) {
+      bioBtn.addEventListener('click', tryBiometric);
+      /* Al abrir la pantalla se ofrece la biometría una sola vez; si se
+         cancela, el usuario puede tocar el botón o escribir la contraseña.
+         Si la página se recargó mientras la app estaba en segundo plano, se
+         espera a que vuelva a estar visible para no abrir el diálogo encima de
+         otra aplicación. */
+      const requestBiometric = () => {
+        if (document.visibilityState === 'visible') {
+          tryBiometric();
+          return;
+        }
+        const onVisible = () => {
+          if (document.visibilityState !== 'visible') return;
+          document.removeEventListener('visibilitychange', onVisible);
+          if (bioBtn.isConnected) tryBiometric();
+        };
+        document.addEventListener('visibilitychange', onVisible);
+      };
+      this.bioTimer = setTimeout(() => {
+        this.bioTimer = null;
+        if (bioBtn.isConnected) requestBiometric();
+      }, 350);
+    }
+
     form.querySelector('#password').focus();
   }
 
@@ -90,11 +155,11 @@ export class AuthUI {
     const { form, error } = this.shell(
       'Crea tu contraseña',
       'Protege tus datos financieros con una contraseña maestra (mínimo 8 caracteres).',
-      `<form id="f" autocomplete="off">
+      `<form id="f" autocomplete="on">
         <label for="password">Contraseña</label>
-        <input type="password" id="password" autocomplete="new-password" minlength="8" required>
+        <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" autocapitalize="none" autocorrect="off" spellcheck="false" required>
         <label for="confirm">Confirmar contraseña</label>
-        <input type="password" id="confirm" autocomplete="new-password" required>
+        <input type="password" id="confirm" name="confirm" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
         <button type="submit" class="primary">Crear y entrar</button>
       </form>`,
       `<p class="hint">Al crear tu cuenta te daremos una frase de recuperación. Guárdala en un gestor de contraseñas.</p>`,
@@ -139,7 +204,7 @@ export class AuthUI {
       'Ingresa tu frase de recuperación (la que guardaste al crear tu cuenta).',
       `<form id="f" autocomplete="off">
         <label for="recoveryKey">Frase de recuperación</label>
-        <input type="text" id="recoveryKey" class="mono" placeholder="XXXX-XXXX-XXXX-…" autocapitalize="characters" autocomplete="off" required>
+        <input type="text" id="recoveryKey" name="recoveryKey" class="mono" placeholder="XXXX-XXXX-XXXX-…" autocapitalize="characters" autocomplete="off" spellcheck="false" required>
         <button type="submit" class="primary">Continuar</button>
       </form>`,
       `<button type="button" class="linkbtn" data-back>Volver a ingresar con contraseña</button>`,
@@ -159,11 +224,11 @@ export class AuthUI {
     const { form, error } = this.shell(
       'Define una contraseña nueva',
       'Tus datos ya están accesibles. Ahora define la contraseña que usarás de aquí en adelante (mínimo 8 caracteres).',
-      `<form id="f" autocomplete="off">
+      `<form id="f" autocomplete="on">
         <label for="password">Contraseña nueva</label>
-        <input type="password" id="password" autocomplete="new-password" minlength="8" required>
+        <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" autocapitalize="none" autocorrect="off" spellcheck="false" required>
         <label for="confirm">Confirmar contraseña</label>
-        <input type="password" id="confirm" autocomplete="new-password" required>
+        <input type="password" id="confirm" name="confirm" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
         <button type="submit" class="primary">Guardar y entrar</button>
       </form>`,
     );

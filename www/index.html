@@ -16,6 +16,9 @@
   <!-- Interfaz financiera: se rellena solo después de desbloquear. -->
   <div id="app" hidden></div>
 
+  <!-- Avisos breves. Vive fuera de #app para que los re-renderizados no lo borren. -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <!-- scrypt-js: script clásico, expone window.scrypt (igual que en escritorio). -->
   <script src="vendor/scrypt.js"></script>
   <!-- Núcleo empaquetado con esbuild (incluye los plugins de Capacitor). -->

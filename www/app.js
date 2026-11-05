@@ -346,7 +346,9 @@ function saveAll(){
     return Promise.resolve(false);
   }
   const payload = JSON.stringify({ entries: state.entries, debts: state.debts, paymentMethods: state.paymentMethods, categories: state.categories });
-  saveChain = saveChain.then(async () => {
+  /* Si un guardado anterior falló, la cadena queda rechazada: se recupera para
+     que el siguiente guardado vuelva a intentarlo (cada uno escribe todo). */
+  saveChain = saveChain.catch(() => false).then(async () => {
     const ok = await storageSet('data', payload);
     if(!ok) showToast('No se pudo guardar. Tus cambios siguen en pantalla: exporta un respaldo desde Inicio.', 7000);
     return ok;
@@ -366,7 +368,11 @@ async function loadTheme(){
 async function saveFlowStyle(){ await storageSet('flowstyle', state.flowStyle); }
 async function saveHideBalance(){ await storageSet('hidebalance', state.hideBalance ? '1' : '0'); }
 async function saveTheme(){ await storageSet('theme', state.theme); }
-function applyTheme(){ document.body.setAttribute('data-theme', state.theme); }
+function applyTheme(){
+  document.body.setAttribute('data-theme', state.theme);
+  /* Los íconos de la barra de estado deben contrastar con el tema de la app. */
+  if(window.systemBars) window.systemBars.setTheme(state.theme);
+}
 /* Tamaño de la vista: 1x es el tamaño original; escala textos, elementos y secciones. */
 const UI_SCALES = [0.6, 0.85, 1, 1.15, 1.3];
 const uiScaleLabel = v => (v === 1 ? '1' : v.toFixed(2)) + 'x';
@@ -539,7 +545,17 @@ function toggleTheme(){
 }
 
 function showToast(msg, ms){
-  const t = document.getElementById('toast');
+  /* El aviso vive fuera de #app, pero se crea si falta para que un fallo de la
+     interfaz nunca interrumpa la acción que lo muestra (por ejemplo, guardar). */
+  let t = document.getElementById('toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.className = 'toast';
+    t.setAttribute('role', 'status');
+    t.setAttribute('aria-live', 'polite');
+    document.body.appendChild(t);
+  }
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(showToast._h);
@@ -1004,6 +1020,77 @@ function toggleSolo(){ state.soloTotal = !state.soloTotal; render(); }
 function toggleLoan(){ state.isLoan = !state.isLoan; render(); }
 function setGran(g){ state.granularity = g; render(); }
 function navPeriod(dir){ state.refDate = shiftRef(state.granularity, state.refDate, dir); render(); }
+
+/* ---------- Atrás y gestos de navegación ---------- */
+const TAB_PAGES = ['home', 'resumen', 'categorias', 'ajustes'];
+
+function hasOpenLayer(){
+  return !!(state.confirmModal || state.pwModal || state.wipeModalOpen
+    || state.pmCloseModal || state.sheet || state.cifra);
+}
+
+/* Cierra primero lo que esté encima (avisos, modales, hoja o desglose). */
+function closeTopLayer(){
+  if(state.confirmModal){ state.confirmModal = null; render(); return true; }
+  if(state.pwModal){ state.pwModal = null; render(); return true; }
+  if(state.wipeModalOpen){ state.wipeModalOpen = false; render(); return true; }
+  if(state.pmCloseModal){ state.pmCloseModal = null; render(); return true; }
+  if(state.sheet){ state.sheet = false; render(); return true; }
+  if(state.cifra){ state.cifra = null; render(); return true; }
+  return false;
+}
+
+/* Gesto/botón Atrás de Android. Devuelve false en Inicio para que la capa
+   nativa minimice la app en vez de cerrarla de golpe. */
+function handleBack(){
+  if(closeTopLayer()) return true;
+  if(state.page === 'home') return false;
+  if(state.page === 'catadmin'){
+    state.editingCatId = null;
+    state.page = 'categorias';
+  } else {
+    state.page = 'home';
+  }
+  render();
+  window.scrollTo(0, 0);
+  return true;
+}
+
+/* Deslizar horizontalmente: entre las pestañas principales y, desde una
+   subpágina, hacia la derecha para volver. Se ignora en controles, en la
+   barra inferior, en las gráficas y en los bordes (los usa el sistema). */
+let swipeStart = null;
+function swipeIgnored(target){
+  return !!(target && target.closest
+    && target.closest('input, textarea, select, .pm-color-picker, .pm-icon-picker, .tabbar, .fc'));
+}
+function onSwipeStart(e){
+  if(e.touches.length !== 1 || hasOpenLayer()){ swipeStart = null; return; }
+  const t = e.touches[0];
+  if(t.clientX < 32 || t.clientX > window.innerWidth - 32){ swipeStart = null; return; }
+  if(swipeIgnored(e.target)){ swipeStart = null; return; }
+  swipeStart = { x: t.clientX, y: t.clientY, at: Date.now() };
+}
+function onSwipeEnd(e){
+  if(!swipeStart) return;
+  const start = swipeStart;
+  swipeStart = null;
+  const t = e.changedTouches && e.changedTouches[0];
+  if(!t || Date.now() - start.at > 800) return;
+  const dx = t.clientX - start.x;
+  const dy = t.clientY - start.y;
+  if(Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2) return;
+  if(hasOpenLayer()) return;
+  const tab = TAB_PAGES.indexOf(state.page);
+  if(tab !== -1){
+    const next = TAB_PAGES[tab + (dx < 0 ? 1 : -1)];
+    if(next){ setPage(next); window.scrollTo(0, 0); }
+    return;
+  }
+  if(dx > 0) handleBack();
+}
+document.addEventListener('touchstart', onSwipeStart, { passive: true });
+document.addEventListener('touchend', onSwipeEnd, { passive: true });
 
 function handleSave(ev){
   ev.preventDefault();
@@ -1631,8 +1718,8 @@ function renderCuentas(){
     <div class="panel">
       <p class="panel-title"><span class="dot" style="background:#636366"></span>Agregar cuenta disponible</p>
       <form id="pm-form">
-        <div class="field"><label>Nombre</label><input type="text" name="name" placeholder="Ej. Tarjeta BBVA" required value="${esc(state.newPmName || '')}" oninput="state.newPmName=this.value"></div>
-        <div class="field"><label>Balance actual de la cuenta</label><input type="number" name="capital" step="0.01" min="0" inputmode="decimal" placeholder="0.00" required value="${esc(state.newPmCapital || '')}" oninput="state.newPmCapital=this.value"></div>
+        <div class="field"><label>Nombre</label><input type="text" name="name" placeholder="Ej. Tarjeta BBVA" required value="${esc(state.newPmName || '')}"></div>
+        <div class="field"><label>Balance actual de la cuenta</label><input type="number" name="capital" step="0.01" min="0" inputmode="decimal" placeholder="0.00" required value="${esc(state.newPmCapital || '')}"></div>
         <div class="field"><label>Color</label>${pmColorPicker(state.newPmColor, 'selectNewPmColor')}</div>
         <div class="field"><label>Ícono</label>${pmIconPicker(state.newPmIcon, 'selectNewPmIcon')}</div>
         <button type="submit" class="btn-save" style="--chip-color:${state.newPmColor};">Agregar</button>
@@ -1801,15 +1888,98 @@ function renderCatAdmin(){
 
 /* ---------- render: ajustes ---------- */
 let autoLock = { minutes: 5, options: [0, 1, 5, 15, 30] };
-if(window.security) window.security.getAutoLock().then(r => { if(r && r.ok){ autoLock = r; if(state.page === 'ajustes') render(); } }).catch(() => {});
+/* La consulta es asíncrona: al llegar solo se sincroniza el <select> si ya está
+   en pantalla. No se vuelve a pintar toda la vista, porque eso podría reemplazar
+   el control justo entre el toque y el clic y perder la interacción. */
+if(window.security) window.security.getAutoLock().then(r => {
+  if(r && r.ok){
+    autoLock = r;
+    const sel = document.getElementById('autolock-select');
+    if(sel && sel.isConnected) sel.value = String(autoLock.minutes);
+  }
+}).catch(() => {});
 const autoLockLabel = m => m === 0 ? 'Nunca' : (m === 1 ? '1 minuto' : m + ' minutos');
 async function setAutoLock(v){
+  const sel = document.getElementById('autolock-select');
   try{
     const r = await window.security.setAutoLock(Number(v));
     if(r && r.ok){ autoLock.minutes = r.minutes; showToast('Bloqueo automático actualizado.'); }
     else showToast((r && r.error) || 'No se pudo cambiar el ajuste.');
   }catch(e){ console.error(e); showToast('No se pudo cambiar el ajuste.'); }
+  /* Refleja el valor real sin reemplazar el DOM (y revierte si el cambio falló). */
+  if(sel && sel.isConnected) sel.value = String(autoLock.minutes);
+}
+
+/* Estado del desbloqueo con huella o rostro. En navegador llega "no disponible". */
+let biometricState = { supported: false, available: false, enabled: false, requiresPassword: false, reason: '', busy: false };
+/* Igual que el bloqueo automático: la consulta asíncrona no repinta la pantalla.
+   Solo actualiza el interruptor y su texto si la sección ya está visible. */
+if(window.security && window.security.biometric){
+  window.security.biometric.status().then(r => {
+    biometricState = { ...biometricState, ...(r || {}), busy: false };
+    syncBiometricSetting();
+  }).catch(() => {});
+}
+function biometricReasonText(){
+  switch(biometricState.reason){
+    case 'NO_HARDWARE': return 'Este teléfono no tiene lector de huellas o cámara compatible.';
+    case 'HW_UNAVAILABLE': return 'La biometría no está disponible en este momento.';
+    case 'NONE_ENROLLED': return 'Configura una huella o rostro en los ajustes de Android.';
+    case 'SECURITY_UPDATE_REQUIRED': return 'Actualiza el sistema para usar la biometría.';
+    case 'WEB': return 'El desbloqueo con huella o rostro solo está disponible en la app de Android.';
+    default: return 'La biometría no está disponible en este teléfono.';
+  }
+}
+function biometricHintText(){
+  return biometricState.busy
+    ? 'Esperando la verificación del teléfono…'
+    : biometricState.requiresPassword
+      ? 'Ingresa tu contraseña una vez después de reiniciar para volver a usar la biometría.'
+      : 'Se guarda una llave cifrada en el teléfono, nunca tu contraseña. Si agregas una huella nueva, la llave se invalida y se pide la contraseña.';
+}
+/* Actualiza el interruptor existente sin reemplazar el DOM. */
+function syncBiometricSetting(){
+  const box = document.querySelector('#toggle-biometric .toggle-box');
+  if(box) box.classList.toggle('on', !!biometricState.enabled);
+  const hint = document.getElementById('biometric-hint');
+  if(hint) hint.textContent = biometricHintText();
+}
+async function toggleBiometric(on){
+  if(biometricState.busy) return;
+  biometricState.busy = true;
   render();
+  try{
+    const r = on
+      ? await window.security.biometric.enable()
+      : await window.security.biometric.disable();
+    if(r && r.ok) showToast(on ? 'Desbloqueo con huella o rostro activado.' : 'Desbloqueo con huella o rostro desactivado.');
+    else showToast((r && r.error) || 'No se pudo cambiar el ajuste.');
+    const st = await window.security.biometric.status();
+    biometricState = { ...biometricState, ...(st || {}), busy: false };
+  }catch(e){
+    console.error(e);
+    biometricState.busy = false;
+    showToast('No se pudo cambiar el ajuste.');
+  }
+  /* El interruptor ya está en pantalla: se actualiza en el sitio. */
+  syncBiometricSetting();
+}
+function renderBiometricSetting(){
+  if(!window.security || !window.security.biometric){
+    return `<p class="hint" style="margin:8px 0 0;">El desbloqueo con huella o rostro solo está disponible en la app de Android.</p>`;
+  }
+  if(!biometricState.supported){
+    return `<p class="hint" style="margin:8px 0 0;">${esc(biometricReasonText())}</p>`;
+  }
+  if(!biometricState.available){
+    return `<p class="hint" style="margin:8px 0 0;">${esc(biometricReasonText())}</p>`;
+  }
+  return `
+    <div class="toggle-row" id="toggle-biometric">
+      <span class="toggle-box ${biometricState.enabled ? 'on' : ''}" style="--chip-color:var(--c-ingreso)"></span>
+      <span class="txt">Usar huella o rostro para desbloquear</span>
+    </div>
+    <p class="hint" id="biometric-hint" style="margin:8px 0 0;">${esc(biometricHintText())}</p>`;
 }
 /* Avisa actividad al proceso principal (como máximo cada 5 s) para el bloqueo por inactividad. */
 let lastPing = 0;
@@ -1819,7 +1989,11 @@ let lastPing = 0;
 }, { capture: true, passive: true }));
 
 let appVersion = '';
-if(window.appInfo) window.appInfo.version().then(v => { appVersion = v || ''; if(state.page === 'ajustes') render(); }).catch(() => {});
+if(window.appInfo) window.appInfo.version().then(v => {
+  appVersion = v || '';
+  const el = document.getElementById('app-version');
+  if(el) el.textContent = 'Metría' + (appVersion ? ' v' + appVersion : '');
+}).catch(() => {});
 
 function renderAjustes(){
   return `
@@ -1836,7 +2010,10 @@ function renderAjustes(){
       <div class="field"><label>Bloquear la app tras</label>
         <select id="autolock-select">${autoLock.options.map(o => `<option value="${o}" ${o === autoLock.minutes ? 'selected' : ''}>${autoLockLabel(o)}${o === 0 ? '' : ' de inactividad'}</option>`).join('')}</select>
       </div>
-      <p class="hint" style="margin:8px 0 0;">Al bloquearse se borra la llave de la memoria y se pide tu contraseña. También se bloquea al suspender o bloquear el equipo.</p>
+      <p class="hint" style="margin:8px 0 0;">Al bloquearse se borra la llave de la memoria y se pide tu contraseña o biometría. El tiempo también cuenta mientras la app está en segundo plano; con “Nunca” no se bloquea sola.</p>
+      <div class="field" style="margin-top:14px;"><label>Desbloqueo rápido</label>
+        ${renderBiometricSetting()}
+      </div>
     </div>
     <p class="section-label">Respaldo</p>
     <div class="panel" style="display:flex;gap:10px;">
@@ -1848,7 +2025,7 @@ function renderAjustes(){
 
     <div class="panel">
       <p class="panel-title"><span class="dot" style="background:#636366"></span>Acerca de</p>
-      <p class="hint" style="margin:0;">Metría${appVersion ? ' v' + esc(appVersion) : ''}</p>
+      <p class="hint" id="app-version" style="margin:0;">Metría${appVersion ? ' v' + esc(appVersion) : ''}</p>
     </div>
     <div class="panel">
       <p class="panel-title"><span class="dot" style="background:var(--c-gasto)"></span>Zona de riesgo</p>
@@ -2411,6 +2588,7 @@ function render(){
   const showTabs = ['home','resumen','categorias','ajustes'].includes(state.page);
   if(showTabs) body += renderTabBar();
   app.className = showTabs ? 'has-tabs' : '';
+  document.body.classList.toggle('has-tabs', showTabs);
 
   app.innerHTML = body;
   bindEvents();
@@ -2449,7 +2627,16 @@ function bindEvents(){
   document.querySelectorAll('.cat-edit-form').forEach(el => el.addEventListener('submit', (ev) => saveCatEdit(ev, el.dataset.catedit)));
   document.querySelectorAll('[data-delcat]').forEach(el => el.addEventListener('click', () => deleteCategory(el.dataset.delcat)));
   const pmForm = document.getElementById('pm-form');
-  if(pmForm) pmForm.addEventListener('submit', addPaymentMethod);
+  if(pmForm){
+    pmForm.addEventListener('submit', addPaymentMethod);
+    /* Conserva lo escrito aunque la vista se vuelva a pintar (por ejemplo al
+       elegir color o ícono). Antes esto se hacía con oninput inline, que no
+       podía ver el estado del IIFE y lanzaba un error en cada tecla. */
+    const pmName = pmForm.elements.name;
+    const pmCapital = pmForm.elements.capital;
+    if(pmName) pmName.addEventListener('input', () => { state.newPmName = pmName.value; });
+    if(pmCapital) pmCapital.addEventListener('input', () => { state.newPmCapital = pmCapital.value; });
+  }
   document.querySelectorAll('[data-delpm]').forEach(el => el.addEventListener('click', () => requestClosePaymentMethod(el.dataset.delpm)));
   const wipeRequestBtn = document.querySelector('[data-wipe-request]');
   if(wipeRequestBtn) wipeRequestBtn.addEventListener('click', requestWipeData);
@@ -2508,6 +2695,8 @@ function bindEvents(){
   document.querySelectorAll('[data-scale]').forEach(el => el.addEventListener('click', () => setUiScale(el.dataset.scale)));
   const alSel = document.getElementById('autolock-select');
   if(alSel) alSel.addEventListener('change', () => setAutoLock(alSel.value));
+  const bioToggle = document.getElementById('toggle-biometric');
+  if(bioToggle) bioToggle.addEventListener('click', () => toggleBiometric(!biometricState.enabled));
   const pwForm = document.getElementById('pw-form');
   if(pwForm){
     pwForm.addEventListener('submit', submitPwModal);
@@ -2546,5 +2735,5 @@ function shutdown(){
   if (root) root.innerHTML = '';
 }
 
-window.MetriaApp = { init, shutdown };
+window.MetriaApp = { init, shutdown, handleBack, closeTopLayer };
 })();

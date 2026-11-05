@@ -107,6 +107,24 @@ export async function prepareNewStore(password) {
   };
 }
 
+const wrappersOf = (w) => ({
+  passwordSalt: w.passwordSalt,
+  recoverySalt: w.recoverySalt,
+  wrappedByPassword: w.wrappedByPassword,
+  wrappedByRecovery: w.wrappedByRecovery,
+});
+
+async function decryptStore(w, masterKey) {
+  let store;
+  try {
+    store = await crypto.decryptJson(w.data, masterKey);
+  } catch {
+    throw new VaultError('CORRUPT');
+  }
+  if (!store || typeof store !== 'object' || Array.isArray(store)) throw new VaultError('CORRUPT');
+  return store;
+}
+
 /* kind: 'password' | 'recovery'. Distingue secreto incorrecto de archivo dañado. */
 export async function unlockWithSecret(kind, secret) {
   const raw = await readRaw();
@@ -122,24 +140,27 @@ export async function unlockWithSecret(kind, secret) {
     throw new VaultError(isPassword ? 'WRONG_PASSWORD' : 'WRONG_RECOVERY');
   }
 
-  let store;
-  try {
-    store = await crypto.decryptJson(w.data, masterKey);
-  } catch {
-    throw new VaultError('CORRUPT');
-  }
-  if (!store || typeof store !== 'object' || Array.isArray(store)) throw new VaultError('CORRUPT');
+  const store = await decryptStore(w, masterKey);
+  return { masterKey, store, wrappers: wrappersOf(w) };
+}
 
-  return {
-    masterKey,
-    store,
-    wrappers: {
-      passwordSalt: w.passwordSalt,
-      recoverySalt: w.recoverySalt,
-      wrappedByPassword: w.wrappedByPassword,
-      wrappedByRecovery: w.wrappedByRecovery,
-    },
-  };
+/* Desbloqueo con una llave maestra ya descifrada (biometría).
+ * La llave viene del Keystore y solo es válida para este archivo. Se copia para
+ * que el llamador pueda borrar el búfer original sin destruir la sesión. */
+export async function unlockWithMasterKey(masterKey) {
+  if (!(masterKey instanceof Uint8Array) || masterKey.length !== 32) {
+    throw new VaultError('BAD_KEY');
+  }
+  const sessionKey = new Uint8Array(masterKey);
+  try {
+    const raw = await readRaw();
+    const w = parseWrapperFile(raw);
+    const store = await decryptStore(w, sessionKey);
+    return { masterKey: sessionKey, store, wrappers: wrappersOf(w) };
+  } catch (e) {
+    sessionKey.fill(0);
+    throw e;
+  }
 }
 
 export async function rewrapPassword(masterKey, newPassword) {
@@ -202,6 +223,7 @@ export function authErrorMessage(e) {
   if (e instanceof VaultError) {
     if (e.code === 'WRONG_PASSWORD') return 'Contraseña incorrecta.';
     if (e.code === 'WRONG_RECOVERY') return 'Frase de recuperación incorrecta.';
+    if (e.code === 'BAD_KEY') return 'La llave de desbloqueo no es válida. Ingresa tu contraseña.';
     if (e.code === 'CORRUPT') return 'El archivo de datos está dañado o es ilegible. No se modificó nada: restaura un respaldo automático.';
   }
   console.error(e);
