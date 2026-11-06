@@ -15,6 +15,8 @@
 
 Principio de precedencia: **`design-tokens.css` manda sobre los valores**; este documento manda sobre las **reglas de uso**. Si hay conflicto, se documenta como decisión pendiente (no se resuelve en silencio).
 
+**[OBLIGATORIO]** La app carga una copia generada en `www/design-tokens.css`. No editar esa copia: se regenera desde `metria-design-system/design-tokens.css` con `npm run sync:tokens` (encadenado a `npm run build:web`).
+
 ---
 
 ## 1. Propósito del sistema
@@ -396,6 +398,7 @@ Lista de verificación normativa (aplica a cada componente):
 
 | Versión | Cambio |
 |---|---|
+| 1.0.4-draft | La app carga una copia generada de los tokens (`www/design-tokens.css`) mediante `npm run sync:tokens`; el logotipo oficial (principal/positiva) sustituye al monograma SVG en acceso e Inicio. |
 | 1.0.3-draft | Decisiones resueltas D-01, D-02, D-03, D-04 y D-07; confirmadas D-18 a D-21. Se añadieron alias de dominio (`--color-summary`, `--color-capital`, `--color-settled`, `--color-transfer`, `--color-petty-cash`, `--color-contribution`) sin valores nuevos. Abono usa `--color-contribution` (excepción documentada). |
 | 1.0.2-draft | Decisiones del responsable: D-18 (grafía METRIA/Metria sin acento), D-19 (se mantiene turquesa/navy), D-20 y D-21 confirmadas. |
 | 1.0.1-draft | Revisión contra el manual de identidad: se corrigió el área de protección del logotipo (2x, no "altura de una barra") y la dirección del degradado (horizontal); se agregaron versiones del logotipo, tamaño mínimo, usos incorrectos y decisiones D-18 a D-21. |

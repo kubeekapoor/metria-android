@@ -68,9 +68,11 @@ body {
 }
 
 .auth-brand .auth-logo {
-  width: 30px;
-  height: 30px;
+  width: 46px;
+  height: auto;
+  aspect-ratio: 927 / 862;
   flex-shrink: 0;
+  display: block;
 }
 
 #auth h1 {

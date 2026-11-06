@@ -159,6 +159,6 @@ async function boot() {
 boot().catch(e => {
   console.error(e);
   document.getElementById('auth').innerHTML =
-    '<div class="auth-wrap"><div class="auth-card"><div class="auth-brand">METRIA</div>'
+    '<div class="auth-wrap"><div class="auth-card"><div class="auth-brand"><img class="brand-mark auth-logo" src="assets/logo/metria-logo-principal.png" width="927" height="862" alt="" aria-hidden="true">METRIA</div>'
     + '<h1>No se pudo iniciar</h1><p class="sub">Cierra Metria y vuelve a abrirla.</p></div></div>';
 });

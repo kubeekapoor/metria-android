@@ -5,13 +5,8 @@
 
 const nextPaint = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-/* La marca de Metria: monograma M plegado, igual que el ícono de la app. */
-const BRAND_MARK = `<svg class="brand-mark auth-logo" viewBox="0 0 64 64" aria-hidden="true">
-  <polygon points="0,7.7 9,2.6 9,58.9 0,64" fill="var(--auth-accent)" opacity=".72"/>
-  <polygon points="9,2.6 32,28.2 32,35.8 9,10.2" fill="var(--auth-accent)"/>
-  <polygon points="32,28.2 55,2.6 55,10.2 32,35.8" fill="var(--auth-accent)" opacity=".86"/>
-  <polygon points="55,2.6 64,7.7 64,64 55,58.9" fill="var(--auth-accent)" opacity=".62"/>
-</svg>`;
+/* La marca de Metria: PNG oficial principal. El acceso siempre es oscuro. */
+const BRAND_MARK = `<img class="brand-mark auth-logo" src="assets/logo/metria-logo-principal.png" width="927" height="862" alt="" aria-hidden="true" draggable="false">`;
 const BRAND = `<div class="auth-brand">${BRAND_MARK}<span>METRIA</span></div>`;
 
 export class AuthUI {

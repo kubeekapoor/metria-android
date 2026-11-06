@@ -11,7 +11,8 @@
     "build:debug": "npm run sync && cd android && ./gradlew assembleDebug",
     "build:apk": "npm run sync && cd android && ./gradlew assembleRelease",
     "test": "node --test tests/*.test.js",
-    "build:web": "esbuild src/core/boot.js --bundle --format=iife --target=es2022 --outfile=www/dist/boot.js",
+    "sync:tokens": "node scripts/sync-design-tokens.mjs",
+    "build:web": "npm run sync:tokens && esbuild src/core/boot.js --bundle --format=iife --target=es2022 --outfile=www/dist/boot.js",
     "test:ui": "node tests/ui-smoke.mjs"
   },
   "dependencies": {

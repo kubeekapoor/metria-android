@@ -60,7 +60,13 @@
   .navbar .title{font-size:18px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;}
   .theme-toggle{margin-left:auto;background:var(--card-alt);border:1px solid var(--line);width:38px;height:38px;border-radius:14px;cursor:pointer;font-size:17px;color:var(--ink);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
   .brand-lockup{display:flex;align-items:center;gap:11px;min-width:0;}
-  .brand-mark{width:38px;height:38px;flex-shrink:0;display:block;}
+  /* Logotipo: 46 px de ancho sobre un lienzo 927:862 para que el símbolo
+     visible mida ~32 px. Nunca se fuerza un cuadrado. */
+  .brand-mark{width:46px;height:auto;aspect-ratio:927/862;flex-shrink:0;display:block;}
+  .brand-mark img{display:block;width:100%;height:auto;}
+  .brand-mark .logo-light{display:none;}
+  :root[data-theme="light"] .brand-mark .logo-dark{display:none;}
+  :root[data-theme="light"] .brand-mark .logo-light{display:block;}
   .brand-text h1{margin:0;line-height:1;}
   .brand-sub{margin:5px 0 0;font-size:11px;color:var(--ink-dim);letter-spacing:0.12em;text-transform:uppercase;font-weight:600;}
 

@@ -46,6 +46,17 @@ try {
   await page.waitForSelector('text=Crea tu contraseña', { timeout: 15000 });
   const authBrand = ((await page.textContent('.auth-brand')) || '').trim();
   if (!authBrand.includes('METRIA') || authBrand.includes('METRÍA')) fail('El wordmark del acceso no es METRIA: ' + authBrand);
+  const authLogo = await page.evaluate(() => {
+    const img = document.querySelector('#auth .auth-logo');
+    if (!img) return null;
+    const r = img.getBoundingClientRect();
+    return { tag: img.tagName, src: img.getAttribute('src'), width: r.width, height: r.height };
+  });
+  if (!authLogo || authLogo.tag !== 'IMG' || !authLogo.src.includes('metria-logo-principal.png')) {
+    fail('El acceso debe usar el PNG principal del logotipo: ' + JSON.stringify(authLogo));
+  } else if (Math.abs(authLogo.width - 46) > 0.5 || Math.abs(authLogo.width / authLogo.height - 927 / 862) > 0.01) {
+    fail('El logotipo del acceso no respeta 46 px de ancho y la proporción 927:862: ' + JSON.stringify(authLogo));
+  }
   await page.screenshot({ path: '/tmp/metria-01-crear.png' });
 
   await page.fill('#password', 'clave-de-prueba');
@@ -63,6 +74,25 @@ try {
   await page.waitForSelector('nav', { timeout: 5000 });
   const homeBrand = ((await page.textContent('.brand-text h1')) || '').trim();
   if (homeBrand !== 'METRIA') fail('El wordmark de Inicio no es METRIA: ' + homeBrand);
+  const homeLogo = await page.evaluate(() => {
+    const wrap = document.querySelector('.brand-lockup .brand-mark');
+    if (!wrap) return null;
+    const dark = wrap.querySelector('.logo-dark');
+    const light = wrap.querySelector('.logo-light');
+    const shown = getComputedStyle(dark).display !== 'none' ? dark : light;
+    const r = shown.getBoundingClientRect();
+    return {
+      dark: dark.getAttribute('src'), light: light.getAttribute('src'),
+      shown: shown.className, width: r.width, height: r.height,
+    };
+  });
+  if (!homeLogo || !homeLogo.dark.includes('metria-logo-principal.png') || !homeLogo.light.includes('metria-logo-positiva.png')) {
+    fail('Inicio no tiene las dos versiones oficiales del logotipo: ' + JSON.stringify(homeLogo));
+  } else if (Math.abs(homeLogo.width - 46) > 0.5 || Math.abs(homeLogo.width / homeLogo.height - 927 / 862) > 0.01) {
+    fail('El logotipo de Inicio no respeta 46 px de ancho y la proporción 927:862: ' + JSON.stringify(homeLogo));
+  } else if (homeLogo.shown !== 'logo-dark') {
+    fail('El tema oscuro debe mostrar el logotipo principal: ' + homeLogo.shown);
+  }
   await page.evaluate(() => document.fonts.ready);
   const fonts = await page.evaluate(() => ({
     body: getComputedStyle(document.body).fontFamily,
@@ -109,7 +139,13 @@ try {
   const themeBefore = await page.getAttribute('html', 'data-theme');
   await page.tap('#theme-toggle');
   await page.waitForFunction((t) => document.documentElement.getAttribute('data-theme') !== t, themeBefore, { timeout: 5000 });
-  console.log('✔ El tema cambia con un toque');
+  const visibleLogoSrc = await page.evaluate(() => {
+    const wrap = document.querySelector('.brand-lockup .brand-mark');
+    return [...wrap.querySelectorAll('img')]
+      .find(img => getComputedStyle(img).display !== 'none')?.getAttribute('src') || '';
+  });
+  if (!visibleLogoSrc.includes('metria-logo-positiva.png')) fail('El tema claro debe mostrar el logotipo positivo: ' + visibleLogoSrc);
+  console.log('✔ El tema cambia con un toque y el logotipo también');
 
   await page.tap('.tabbar [data-page="ajustes"]');
   await page.waitForSelector('#autolock-select', { timeout: 5000 });
