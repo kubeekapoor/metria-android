@@ -52,8 +52,8 @@ echo "== Compilando APK =="
 npm run build:apk
 
 mkdir -p dist
-cp android/app/build/outputs/apk/release/app-release.apk dist/metria-1.1.0-android.apk
+cp android/app/build/outputs/apk/release/app-release.apk dist/metria-1.2.0-android.apk
 
 echo
-echo "APK listo: dist/metria-1.1.0-android.apk"
-ls -lh dist/metria-1.1.0-android.apk
+echo "APK listo: dist/metria-1.2.0-android.apk"
+ls -lh dist/metria-1.2.0-android.apk

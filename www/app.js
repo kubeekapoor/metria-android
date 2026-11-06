@@ -15,7 +15,7 @@ const CATEGORIES = [
 const catById = id => CATEGORIES.find(c => c.id === id);
 const CAPTURE_CATEGORIES = CATEGORIES.filter(c => c.id !== 'deuda' && c.id !== 'abono' && c.id !== 'transferencia' && c.id !== 'capital');
 
-const PM_COLORS = ['#FF3B30','#FF9500','#FFCC00','#34C759','#00C7BE','#32ADE6','#007AFF','#5E5CE6','#AF52DE','#FF2D55'];
+const PM_COLORS = ['#4C6FFF','#18B47A','#F5A524','#F2555A','#8B5CF6','#14B8A6','#0EA5E9','#EC4899','#FFCC00','#64748B'];
 const PM_ICONS = [
   { id:'tarjeta', label:'Tarjeta', glyph:'▭' },
   { id:'billete', label:'Billete', glyph:'$' },
@@ -357,7 +357,8 @@ function saveAll(){
 }
 async function loadTheme(){
   const raw = await storageGet('theme');
-  state.theme = raw || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+  /* La identidad de Metría es oscura; el tema claro sigue disponible. */
+  state.theme = raw === 'light' ? 'light' : 'dark';
   state.hideBalance = (await storageGet('hidebalance')) === '1';
   state.flowStyle = (await storageGet('flowstyle')) === 'barras' ? 'barras' : 'linea';
   const sc = parseFloat(await storageGet('uiscale'));
@@ -1460,6 +1461,15 @@ function renderTopbar(title, showBack, backPage, backLabel){
 /* ---------- íconos (Lucide, licencia ISC, https://lucide.dev) ---------- */
 const ICONS = {"home": "<path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"></path><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"></path>", "pie": "<path d=\"M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z\"></path><path d=\"M21.21 15.89A10 10 0 1 1 8 2.83\"></path>", "bars": "<path d=\"M3 3v16a2 2 0 0 0 2 2h16\"></path><path d=\"M18 17V9\"></path><path d=\"M13 17V5\"></path><path d=\"M8 17v-3\"></path>", "gear": "<path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"></path><circle cx=\"12\" cy=\"12\" r=\"3\"></circle>", "plus": "<path d=\"M5 12h14\"></path><path d=\"M12 5v14\"></path>", "eye": "<path d=\"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0\"></path><circle cx=\"12\" cy=\"12\" r=\"3\"></circle>", "eyeoff": "<path d=\"M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49\"></path><path d=\"M14.084 14.158a3 3 0 0 1-4.242-4.242\"></path><path d=\"M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143\"></path><path d=\"m2 2 20 20\"></path>", "wallet": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"></path><path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"></path>", "down": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 8v8\"></path><path d=\"m8 12 4 4 4-4\"></path>", "up": "<circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m16 12-4-4-4 4\"></path><path d=\"M12 16V8\"></path>", "swap": "<path d=\"M8 3 4 7l4 4\"></path><path d=\"M4 7h16\"></path><path d=\"m16 21 4-4-4-4\"></path><path d=\"M20 17H4\"></path>", "coins": "<circle cx=\"8\" cy=\"8\" r=\"6\"></circle><path d=\"M18.09 10.37A6 6 0 1 1 10.34 18\"></path><path d=\"M7 6h1v4\"></path><path d=\"m16.71 13.88.7.71-2.82 2.82\"></path>", "hand": "<path d=\"M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17\"></path><path d=\"m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9\"></path><path d=\"m2 16 6 6\"></path><circle cx=\"16\" cy=\"9\" r=\"2.9\"></circle><circle cx=\"6\" cy=\"5\" r=\"3\"></circle>", "bank": "<line x1=\"3\" x2=\"21\" y1=\"22\" y2=\"22\"></line><line x1=\"6\" x2=\"6\" y1=\"18\" y2=\"11\"></line><line x1=\"10\" x2=\"10\" y1=\"18\" y2=\"11\"></line><line x1=\"14\" x2=\"14\" y1=\"18\" y2=\"11\"></line><line x1=\"18\" x2=\"18\" y1=\"18\" y2=\"11\"></line><polygon points=\"12 2 20 7 4 7\"></polygon>", "chev": "<path d=\"m9 18 6-6-6-6\"></path>", "chevd": "<path d=\"m6 9 6 6 6-6\"></path>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"></circle><path d=\"M12 2v2\"></path><path d=\"M12 20v2\"></path><path d=\"m4.93 4.93 1.41 1.41\"></path><path d=\"m17.66 17.66 1.41 1.41\"></path><path d=\"M2 12h2\"></path><path d=\"M20 12h2\"></path><path d=\"m6.34 17.66-1.41 1.41\"></path><path d=\"m19.07 4.93-1.41 1.41\"></path>", "moon": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"></path>", "x": "<path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path>", "trend": "<polyline points=\"22 7 13.5 15.5 8.5 10.5 2 17\"></polyline><polyline points=\"16 7 22 7 22 13\"></polyline>", "cal": "<path d=\"M8 2v4\"></path><path d=\"M16 2v4\"></path><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"></rect><path d=\"M3 10h18\"></path>", "receipt": "<path d=\"M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z\"></path><path d=\"M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8\"></path><path d=\"M12 17.5v-11\"></path>"};
 function ic(name){ return `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`; }
+/* Monograma M plegado: la misma marca del ícono de la app. */
+function logoMark(cls){
+  return `<svg class="${cls || 'brand-mark'}" viewBox="0 0 64 64" aria-hidden="true">
+    <polygon points="0,7.7 9,2.6 9,58.9 0,64" fill="var(--accent)" opacity=".72"/>
+    <polygon points="9,2.6 32,28.2 32,35.8 9,10.2" fill="var(--accent)"/>
+    <polygon points="32,28.2 55,2.6 55,10.2 32,35.8" fill="var(--accent)" opacity=".86"/>
+    <polygon points="55,2.6 64,7.7 64,64 55,58.9" fill="var(--accent)" opacity=".62"/>
+  </svg>`;
+}
 const ENTRY_ICON = { ingreso:'down', capital:'wallet', gasto:'up', cajachica:'coins', abono:'hand', deuda:'bank', transferencia:'swap' };
 const mny = n => state.hideBalance ? '$ ••••••' : fmt(n);
 const sgn = n => (n > 0 ? '+' : '') + fmt(n);
@@ -1642,7 +1652,10 @@ function renderHome(){
   const accsList = accsConSaldo.length ? `<div class="bal-accs">${accsConSaldo.map(m => `<div class="bal-acc"><span class="an"><i style="background:${m.color}"></i><span>${esc(m.name)}</span></span><b>${mny(m.balance)}</b></div>`).join('')}</div>` : '';
 
   return `
-    <div class="hd"><h1>Metría</h1>
+    <div class="hd">
+      <div class="brand-lockup">${logoMark('brand-mark')}
+        <div class="brand-text"><h1>Metría</h1><p class="brand-sub">Tus finanzas, en orden</p></div>
+      </div>
       <button class="theme-toggle" id="theme-toggle" title="Cambiar apariencia">${ic(state.theme==='dark'?'sun':'moon')}</button>
     </div>
     <div class="sub-hd"><h2>Resumen de hoy</h2><p>${dateLabel}</p></div>
@@ -1653,6 +1666,7 @@ function renderHome(){
           <div class="bal-lbl">Balance actual <button class="eye" id="eye-toggle" aria-label="${state.hideBalance?'Mostrar':'Ocultar'} balance">${ic(state.hideBalance?'eyeoff':'eye')}</button></div>
           <button type="button" class="bal-fig" data-cifra="balance" aria-label="Ver desglose del balance">${mny(gb.total)}</button>
         </div>
+        <span class="bal-icon">${ic('wallet')}</span>
       </div>
       ${accsList}
       <div class="mini-row">
@@ -1671,7 +1685,7 @@ function renderHome(){
       ${flowChart(fd, state.flowStyle, state.flowSel)}
       ${flowDetail(fd, state.flowSel)}
       <div class="fl-foot">
-        <span><span class="lg"><i style="background:var(--ink)"></i>Ingresos</span><span class="lg"><i style="background:var(--accent)"></i>Gastos</span></span>
+        <span><span class="lg"><i style="background:var(--pos)"></i>Ingresos</span><span class="lg"><i style="background:var(--neg)"></i>Gastos</span></span>
       </div>
     </div>
 
@@ -1682,7 +1696,8 @@ function renderHome(){
       ${recent.length ? recent.map(e => {
         const c = catById(e.type), pm = e.paymentMethod ? paymentMethodName(e.paymentMethod) : '';
         const s = c ? c.sign : 0, out = s < 0;
-        return `<div class="rec"><span class="ri">${ic(ENTRY_ICON[e.type] || 'receipt')}</span>
+        const tint = c ? c.color : 'var(--accent)';
+        return `<div class="rec"><span class="ri" style="background:color-mix(in srgb, ${tint} 16%, var(--card-alt));border-color:color-mix(in srgb, ${tint} 22%, var(--line));color:${tint}">${ic(ENTRY_ICON[e.type] || 'receipt')}</span>
           <span class="rm"><div class="rt">${esc(e.detail || (c ? c.label : ''))}</div><div class="rs">${fmtDate(e.date)} · ${pm || (c ? c.label : '')}</div></span>
           <span class="ra ${out ? 'out' : ''}">${s > 0 ? '+' : s < 0 ? '-' : ''}${mny(e.amount)}</span></div>`;
       }).join('') : `<div class="empty">Aún no hay movimientos. Toca + para registrar el primero.</div>`}
@@ -1782,7 +1797,7 @@ function renderCategorias(){
           <span class="rm"><div class="rt">${esc(r.label)}</div>
             <div class="bar-track" style="margin-top:6px;"><span class="bar-fill" style="width:${(r.total/max*100).toFixed(1)}%;background:var(--accent);"></span></div>
             <div class="rs">${r.count} movimiento${r.count===1?'':'s'} · ${bd.total ? (r.total/bd.total*100).toFixed(0) : 0}%</div></span>
-          <span class="ra">${mny(r.total)}</span>
+          <span class="ra neutral">${mny(r.total)}</span>
         </div>`).join('') : `<div class="empty">Sin ${state.catKind === 'gasto' ? 'gastos' : 'ingresos'} en este periodo.</div>`}
     </div>
     <div class="row-card" data-page="catadmin"><span class="ri">${ic('bars')}</span><span class="rm"><div class="rt">Mis categorías</div><div class="rs">Crear, renombrar o quitar</div></span>${ic('chev')}</div>
@@ -1999,14 +2014,14 @@ function renderAjustes(){
   return `
     ${renderTopbar('Ajustes', true)}
     <div class="panel">
-      <p class="panel-title"><span class="dot" style="background:var(--c-transferencia)"></span>Apariencia</p>
+      <p class="panel-title"><span class="dot" style="background:var(--accent)"></span>Apariencia</p>
       <div class="field"><label>Tamaño de la vista</label>
         <div class="scale-opts" role="group" aria-label="Tamaño de la vista">${UI_SCALES.map(v => `<button type="button" class="scale-opt ${v === state.uiScale ? 'active' : ''}" data-scale="${v}" aria-pressed="${v === state.uiScale}">${uiScaleLabel(v)}</button>`).join('')}</div>
       </div>
       <p class="hint" style="margin:8px 0 0;">1x es el tamaño original. Con valores menores todo se ve más pequeño; con valores mayores, textos, elementos y secciones crecen.</p>
     </div>
     <div class="panel">
-      <p class="panel-title"><span class="dot" style="background:var(--c-transferencia)"></span>Seguridad</p>
+      <p class="panel-title"><span class="dot" style="background:var(--c-deuda)"></span>Seguridad</p>
       <div class="field"><label>Bloquear la app tras</label>
         <select id="autolock-select">${autoLock.options.map(o => `<option value="${o}" ${o === autoLock.minutes ? 'selected' : ''}>${autoLockLabel(o)}${o === 0 ? '' : ' de inactividad'}</option>`).join('')}</select>
       </div>
@@ -2199,8 +2214,8 @@ function renderDeudasLiquidadas(){
   const liquidated = liquidatedDebts();
   const total = liquidated.reduce((s,d)=>s+d.amount,0);
   const rows = liquidated.length ? liquidated.map(d => `
-    <div class="entry-row" style="border-bottom:1px solid rgba(57,255,20,.25);">
-      <span class="entry-cat" style="background:var(--c-liquidada);box-shadow:0 0 6px rgba(57,255,20,.6);"></span>
+    <div class="entry-row" style="border-bottom:1px solid var(--line);">
+      <span class="entry-cat" style="background:var(--c-liquidada);"></span>
       <div class="entry-main">
         <div class="entry-detail" style="color:var(--c-liquidada);font-weight:600;">${esc(d.name)}</div>
         <div class="entry-meta">${fmt(d.amount)} original · ${d.numAbonos} abono${d.numAbonos===1?'':'s'} · inicio ${fmtDate(d.date)} · liquidada ${fmtDate(d.lastPaymentDate)}</div>
@@ -2210,13 +2225,13 @@ function renderDeudasLiquidadas(){
 
   return `
     ${renderTopbar('Deudas liquidadas', true)}
-    <div class="balance-panel" style="border-color:var(--c-liquidada);box-shadow:0 0 16px rgba(57,255,20,.35), var(--shadow-md);">
+    <div class="balance-panel" style="border-color:color-mix(in srgb, var(--c-liquidada) 26%, var(--line));">
       <div class="balance-label" style="color:var(--c-liquidada);">Total de deudas liquidadas</div>
-      <div class="balance-figure" style="color:var(--c-liquidada);text-shadow:0 0 10px rgba(57,255,20,.5);">${fmt(total)}</div>
+      <div class="balance-figure">${fmt(total)}</div>
       <div class="balance-sub">${liquidated.length} deuda${liquidated.length===1?'':'s'} liquidada${liquidated.length===1?'':'s'}</div>
     </div>
     <p class="section-label">Acreedores liquidados</p>
-    <div class="panel" style="border-color:rgba(57,255,20,.3);">${rows}</div>
+    <div class="panel">${rows}</div>
   `;
 }
 
@@ -2262,7 +2277,7 @@ function renderDeuda(){
     <p class="section-label">Lo que debes</p>
     <div class="panel">${debtRows}</div>
     <div class="panel" style="text-align:center;">
-      <button type="button" class="btn-save" data-page="deudas-liquidadas" style="--chip-color:var(--c-liquidada);color:#0B0B12;">Deudas liquidadas</button>
+      <button type="button" class="btn-save" data-page="deudas-liquidadas">Deudas liquidadas</button>
     </div>
     ${abonoForm}
     <p class="section-label">Abonos recientes</p>

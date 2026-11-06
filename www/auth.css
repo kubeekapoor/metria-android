@@ -2,16 +2,16 @@
    entra, app.css toma el control del resto de la interfaz. */
 
 :root {
-  color-scheme: dark;
-  --auth-bg: #0B0B12;
-  --auth-card: #17171F;
-  --auth-line: #2C2C38;
-  --auth-ink: #F2F2F5;
-  --auth-dim: #9A9AA6;
-  --auth-accent: #435581;
-  --auth-accent-ink: #E6E9F2;
-  --auth-danger: #FF6B6B;
-  --auth-warn: #FF9F0A;
+  --auth-bg: #08080D;
+  --auth-card: #13141C;
+  --auth-card-alt: #1B1D27;
+  --auth-line: #2A2C38;
+  --auth-ink: #F4F5F9;
+  --auth-dim: #A2A6B5;
+  --auth-accent: #4C6FFF;
+  --auth-accent-ink: #FFFFFF;
+  --auth-danger: #FF5C64;
+  --auth-warn: #FFB020;
   --auth-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -31,6 +31,9 @@ body {
 
 [hidden] { display: none !important; }
 
+/* El acceso es siempre oscuro; la app financiera decide su propio esquema. */
+#auth { color-scheme: dark; }
+
 .auth-wrap {
   min-height: 100vh;
   min-height: 100dvh;
@@ -47,17 +50,27 @@ body {
   max-width: 380px;
   padding: 26px 22px;
   background: var(--auth-card);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 
 .auth-brand {
-  font-size: 13px;
-  letter-spacing: 0.16em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--auth-dim);
-  margin-bottom: 14px;
+  font-weight: 700;
+  color: var(--auth-ink);
+  margin-bottom: 18px;
+}
+
+.auth-brand .auth-logo {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
 }
 
 #auth h1 {
@@ -76,7 +89,7 @@ body {
 #auth label {
   display: block;
   font-size: 13px;
-  color: #C9C9D3;
+  color: #C9CBD5;
   margin: 14px 0 6px;
 }
 
@@ -84,9 +97,9 @@ body {
   width: 100%;
   min-height: 48px;
   padding: 12px 13px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--auth-line);
-  background: #0F0F16;
+  background: var(--auth-card-alt);
   color: var(--auth-ink);
   font-size: 16px; /* evita el zoom automático del navegador */
   font-family: inherit;
@@ -95,7 +108,7 @@ body {
 #auth input:focus {
   outline: none;
   border-color: var(--auth-accent);
-  box-shadow: 0 0 0 2px rgba(67, 85, 129, 0.35);
+  box-shadow: 0 0 0 3px rgba(76, 111, 255, 0.24);
 }
 
 #auth input.mono, #auth .recovery-box { font-family: var(--auth-mono); }
@@ -116,6 +129,7 @@ body {
   border: none;
   background: var(--auth-accent);
   color: var(--auth-accent-ink);
+  box-shadow: 0 10px 26px rgba(76, 111, 255, 0.28);
 }
 
 #auth button.primary:disabled { opacity: 0.45; cursor: default; }
@@ -126,9 +140,9 @@ body {
   padding: 8px;
   border: none;
   background: none;
-  color: #8E9BC0;
+  color: var(--auth-accent);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 #auth .error {
@@ -150,9 +164,9 @@ body {
   margin-top: 4px;
   padding: 15px 14px;
   border: 1px solid var(--auth-line);
-  border-radius: 12px;
-  background: #0F0F16;
-  color: #FFD60A;
+  border-radius: 14px;
+  background: var(--auth-card-alt);
+  color: #FFD166;
   font-size: 15px;
   letter-spacing: 0.6px;
   text-align: center;

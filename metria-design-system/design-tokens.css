@@ -1,0 +1,312 @@
+/* ==========================================================================
+   Metria — design-tokens.css  (v1.0.0-draft)
+   Fuente única de verdad de los valores visuales.
+   - Nombres en inglés, comentarios en español.
+   - Tema oscuro = tema principal (valores por defecto en :root).
+   - Tema claro = [data-theme="light"] (mecanismo propuesto; ver
+     Design-System-Metria.md §7 "Decisiones pendientes").
+   - Sin transparencias decorativas: todo color es sólido. Las únicas
+     excepciones son el scrim de modales y el anillo de foco (ver abajo).
+   - Contrastes calculados (WCAG 2.x) y documentados en Design-System-Metria.md §5.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TOKENS INDEPENDIENTES DEL TEMA
+   -------------------------------------------------------------------------- */
+:root {
+  /* 1.1 Marca (primitivos). No usar directamente en componentes salvo logotipo
+        e identidad; los componentes consumen tokens semánticos. */
+  --brand-turquoise: #30E3CA;
+  --brand-cyan: #15B0E7;
+  --brand-navy: #005691;
+  --brand-black: #000000;
+  --brand-white: #FFFFFF;
+  /* Degradado reservado a logotipo y elementos de identidad (splash, acerca de).
+     Manual de identidad §02: "de turquesa a azul, de izquierda a derecha" (horizontal).
+     Para el logotipo usar siempre el archivo oficial, no recrear el degradado en CSS. */
+  --brand-gradient: linear-gradient(90deg, #30E3CA 0%, #15B0E7 55%, #005691 100%);
+
+  /* Logotipo (Manual de identidad §03) */
+  --logo-min-width-digital: 32px;  /* tamaño mínimo digital; impresión: 15 mm */
+  /* Área de protección = 2x, donde x = ancho de UNA barra del logotipo (depende
+     del tamaño renderizado; se calcula, no es un token fijo). */
+
+  /* 1.2 Tipografía */
+  --font-heading: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-numeric-features: 'tnum' 1, 'lnum' 1; /* cifras tabulares para alinear montos */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Escala (tamaño / interlineado / tracking) */
+  --text-display-size: 48px;   --text-display-line: 1.15; --text-display-tracking: -0.02em;
+  --text-display-size-compact: 36px; /* Display en viewport < 768px */
+  --text-h1-size: 30px;        --text-h1-line: 1.2;       --text-h1-tracking: -0.01em;
+  --text-h2-size: 24px;        --text-h2-line: 1.25;      --text-h2-tracking: -0.01em;
+  --text-h3-size: 20px;        --text-h3-line: 1.3;       --text-h3-tracking: 0;
+  --text-card-title-size: 18px;--text-card-title-line: 1.35; --text-card-title-tracking: 0;
+  --text-body-size: 16px;      --text-body-line: 1.5;     --text-body-tracking: 0;
+  --text-secondary-size: 14px; --text-secondary-line: 1.45; --text-secondary-tracking: 0;
+  --text-label-size: 12px;     --text-label-line: 1.35;   --text-label-tracking: 0.02em;
+  /* Mínimo funcional permitido: 12px. No definir tamaños menores. */
+
+  /* 1.3 Espaciado (múltiplos de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* 1.4 Radios */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+
+  /* 1.5 Bordes */
+  --border-width: 1px;
+  --border-width-strong: 2px;
+
+  /* 1.6 Layout */
+  --layout-content-max: 1200px;
+  --layout-content-narrow: 720px;
+  --layout-gutter-mobile: var(--space-4);
+  --layout-gutter-tablet: var(--space-6);
+  --layout-gutter-desktop: var(--space-8);
+  --layout-section-gap: var(--space-8);
+  --layout-card-padding: var(--space-5);
+  --layout-card-padding-compact: var(--space-4);
+  --layout-element-gap: var(--space-4);
+  --layout-sidebar-width: 248px;
+  --layout-bottom-nav-height: 64px;
+  --layout-topbar-height: 56px;
+  --layout-modal-max: 480px;
+  /* Safe areas de WebView (alineado con mobile.css del proyecto Android) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Breakpoints (documentales: CSS no admite var() dentro de @media) */
+  --bp-sm: 480px;   /* móvil grande */
+  --bp-md: 768px;   /* tablet */
+  --bp-lg: 1024px;  /* escritorio */
+  --bp-xl: 1280px;
+
+  /* Tamaños de objetivo táctil */
+  --target-min: 44px;        /* obligatorio en controles táctiles */
+  --control-height-sm: 36px; /* solo escritorio con puntero preciso */
+  --control-height-md: 44px;
+  --control-height-lg: 52px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+
+  /* 1.7 Movimiento */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* 1.8 Z-index */
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-nav: 200;
+  --z-dropdown: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* 1.9 Gráficas (tamaños; los colores dependen del tema) */
+  --chart-stroke-width: 2px;
+  --chart-point-radius: 4px;
+  --chart-bar-radius: 4px;
+  --chart-gap: var(--space-2);
+}
+
+/* --------------------------------------------------------------------------
+   2. TEMA OSCURO (principal) — valores por defecto
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Fondos y superficies */
+  --color-bg: #000000;
+  --color-surface-1: #0D0F12;
+  --color-surface-2: #15191E;
+  --color-surface-3: #20262D;
+
+  /* Texto */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #A6B0BA;
+  --color-text-muted: #8593A0;       /* ajustado desde #788692 (fallaba AA en surface-3) */
+  --color-text-disabled: #5A6672;    /* exento de WCAG por ser deshabilitado */
+  --color-text-on-accent: #000000;   /* texto sobre action-primary */
+  --color-text-link: #30E3CA;
+
+  /* Bordes */
+  --color-border: #2A323A;           /* decorativo: separadores y tarjetas */
+  --color-border-control: #65727E;   /* campos/controles: ≥3:1 sobre todas las superficies */
+  --color-border-strong: #A6B0BA;
+
+  /* Acción primaria */
+  --color-action-primary: #30E3CA;
+  --color-action-primary-hover: #5CEBD6;
+  --color-action-primary-pressed: #22C9B1;
+  --color-action-secondary-bg: #20262D;
+  --color-action-secondary-hover: #2A323A;
+
+  /* Activo / seleccionado */
+  --color-active: #30E3CA;
+  --color-active-bg: #0B2E2A;
+  --color-selected-bg: #20262D;
+  --color-selected-border: #30E3CA;
+
+  /* Foco */
+  --color-focus-ring: #30E3CA;
+
+  /* Estados semánticos: color de texto/icono + fondo sólido sutil */
+  --color-income: #34D399;       --color-income-bg: #0D2B22;
+  --color-expense: #FF6B7A;      --color-expense-bg: #331519;
+  --color-debt: #C98BFF;         --color-debt-bg: #2A1836;
+  --color-warning: #FBBF24;      --color-warning-bg: #33280A;
+  --color-error: #FF5C5C;        --color-error-bg: #331414;
+  --color-info: #15B0E7;         --color-info-bg: #0A2733;
+
+  /* Botón destructivo (relleno sólido; texto blanco ≥4.5:1) */
+  --color-action-danger: #D92D20;
+  --color-action-danger-hover: #E5483C;
+  --color-text-on-danger: #FFFFFF;
+
+  /* Deshabilitado */
+  --color-disabled-bg: #15191E;
+  --color-disabled-border: #2A323A;
+
+  /* Gráficas: orden de series (siempre acompañar con etiqueta/patrón) */
+  --chart-series-1: #30E3CA;
+  --chart-series-2: #15B0E7;
+  --chart-series-3: #C98BFF;
+  --chart-series-4: #FBBF24;
+  --chart-series-5: #FF6B7A;
+  --chart-series-6: #A6B0BA;
+  --chart-grid: #20262D;
+  --chart-axis-text: #A6B0BA;
+
+  /* Sombras (moderadas, sobre fondos oscuros se apoyan en borde) */
+  --shadow-sm: 0 1px 2px #000000;
+  --shadow-md: 0 4px 12px #000000;
+  --shadow-lg: 0 12px 32px #000000;
+
+  /* Scrim de modal: única transparencia permitida (función, no decoración) */
+  --color-scrim: rgba(0, 0, 0, 0.72);
+}
+
+/* --------------------------------------------------------------------------
+   3. TEMA CLARO
+   -------------------------------------------------------------------------- */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg: #F5F7F8;
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #EDF1F4;
+  --color-surface-3: #E3E9ED;
+
+  --color-text-primary: #111820;
+  --color-text-secondary: #52616D;
+  --color-text-muted: #5A6B77;       /* ajustado desde #687985 (fallaba AA en bg, surface-2 y surface-3) */
+  --color-text-disabled: #8A98A3;
+  --color-text-on-accent: #FFFFFF;
+  --color-text-link: #005691;
+
+  --color-border: #DCE3E8;
+  --color-border-control: #6F7E8A;
+  --color-border-strong: #52616D;
+
+  --color-action-primary: #005691;
+  --color-action-primary-hover: #004577;
+  --color-action-primary-pressed: #003A66;
+  --color-action-secondary-bg: #EDF1F4;
+  --color-action-secondary-hover: #E3E9ED;
+
+  --color-active: #006B5E;
+  --color-active-bg: #DDF3EF;
+  --color-selected-bg: #E3E9ED;
+  --color-selected-border: #005691;
+
+  --color-focus-ring: #005691;
+
+  --color-income: #097048;       --color-income-bg: #E3F4EC;
+  --color-expense: #C4283C;      --color-expense-bg: #FBE6E9;
+  --color-debt: #8E2CB0;         --color-debt-bg: #F3E6F8;
+  --color-warning: #8A5A00;      --color-warning-bg: #FFF1D6;
+  --color-error: #B3261E;        --color-error-bg: #FCE8E6;
+  --color-info: #00659A;         --color-info-bg: #E1F1F9;
+
+  --color-action-danger: #B3261E;
+  --color-action-danger-hover: #8F1E18;
+  --color-text-on-danger: #FFFFFF;
+
+  --color-disabled-bg: #EDF1F4;
+  --color-disabled-border: #DCE3E8;
+
+  --chart-series-1: #006B5E;
+  --chart-series-2: #00659A;
+  --chart-series-3: #8E2CB0;
+  --chart-series-4: #8A5A00;
+  --chart-series-5: #C4283C;
+  --chart-series-6: #52616D;
+  --chart-grid: #E3E9ED;
+  --chart-axis-text: #52616D;
+
+  --shadow-sm: 0 1px 2px #DCE3E8;
+  --shadow-md: 0 4px 12px #CBD5DC;
+  --shadow-lg: 0 12px 32px #B8C4CD;
+
+  --color-scrim: rgba(17, 24, 32, 0.56);
+}
+
+/* --------------------------------------------------------------------------
+   4. ESTADOS DE INTERACCIÓN Y ACCESIBILIDAD (independientes del tema)
+   Los componentes los aplican con estas variables; no redefinir por componente.
+   -------------------------------------------------------------------------- */
+:root {
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring: var(--focus-ring-width) solid var(--color-focus-ring);
+
+  --state-disabled-cursor: not-allowed;
+  --state-disabled-pointer: none;
+  --state-pressed-scale: 0.98;
+}
+
+/* Foco visible solo con teclado / tecnología asistiva */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Respeto a la preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+}
+
+/* Utilidad de cifras: montos, balances y tablas */
+.num,
+[data-numeric] {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: var(--font-numeric-features);
+}

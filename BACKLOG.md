@@ -1,4 +1,4 @@
-# Backlog — Metría Android 1.1.0
+# Backlog — Metría Android 1.2.0
 
 Estados: **Pendiente** · **En curso** · **En revisión** (probado de forma
 automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
@@ -77,9 +77,8 @@ Al conectar un teléfono o instalar el APK:
 15. Rotar el teléfono y abrir el teclado en un formulario.
 16. Revisar que la barra inferior y los modales respeten las safe areas.
 
-## Mejoras futuras (no bloquean 1.1.0)
+## Mejoras futuras (no bloquean 1.2.0)
 
-- Ícono definitivo.
 - Exportar a CSV/PDF.
 - Widget de saldo.
 - Pruebas instrumentadas (Espresso) para el WebView.

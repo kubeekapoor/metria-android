@@ -5,11 +5,20 @@
 
 const nextPaint = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+/* La marca de Metría: monograma M plegado, igual que el ícono de la app. */
+const BRAND_MARK = `<svg class="brand-mark auth-logo" viewBox="0 0 64 64" aria-hidden="true">
+  <polygon points="0,7.7 9,2.6 9,58.9 0,64" fill="var(--auth-accent)" opacity=".72"/>
+  <polygon points="9,2.6 32,28.2 32,35.8 9,10.2" fill="var(--auth-accent)"/>
+  <polygon points="32,28.2 55,2.6 55,10.2 32,35.8" fill="var(--auth-accent)" opacity=".86"/>
+  <polygon points="55,2.6 64,7.7 64,64 55,58.9" fill="var(--auth-accent)" opacity=".62"/>
+</svg>`;
+const BRAND = `<div class="auth-brand">${BRAND_MARK}<span>Metría</span></div>`;
+
 export class AuthUI {
   constructor(root, handlers) {
     this.root = root;
     this.h = handlers;
-    this.version = handlers.version || '1.1.0';
+    this.version = handlers.version || '1.2.0';
     this.lastBiometric = { enabled: false };
     this.bioTimer = null;
   }
@@ -26,7 +35,7 @@ export class AuthUI {
     this.root.innerHTML = `
       <div class="auth-wrap">
         <div class="auth-card">
-          <div class="auth-brand">Metría</div>
+          ${BRAND}
           <h1>${title}</h1>
           <p class="sub">${subtitle}</p>
           ${body}
@@ -246,7 +255,7 @@ export class AuthUI {
   showError(message) {
     this.root.innerHTML = `
       <div class="auth-wrap"><div class="auth-card">
-        <div class="auth-brand">Metría</div>
+        ${BRAND}
         <h1>No se pudo abrir</h1>
         <p class="sub">${message}</p>
       </div></div>`;

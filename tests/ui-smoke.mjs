@@ -141,7 +141,7 @@ try {
 
   await page.fill('#pm-form input[name="name"]', 'Efectivo');
   await page.fill('#pm-form input[name="capital"]', '1000');
-  await page.tap('[data-pmcolor-fn="selectNewPmColor"][data-pmcolor="#34C759"]');
+  await page.tap('[data-pmcolor-fn="selectNewPmColor"][data-pmcolor="#18B47A"]');
   await page.waitForFunction(() => document.querySelector('#pm-form input[name="name"]').value === 'Efectivo', null, { timeout: 5000 });
   await page.tap('#pm-form button[type="submit"]');
   await page.waitForFunction(() => [...document.querySelectorAll('.entry-detail')].some((e) => e.textContent.includes('Efectivo')), null, { timeout: 5000 });

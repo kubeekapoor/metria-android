@@ -2,6 +2,34 @@
 
 Formato: `YYYY-MM-DD · área · cambio`.
 
+## [1.2.0] — 2026-11-04
+
+### Nuevo diseño
+- Identidad visual renovada: fondo oscuro (`#08080D`), tarjetas elevadas
+  (`#13141C`), acento azul (`#4C6FFF`), verde para ingresos, rojo para gastos y
+  ámbar para deudas. Colores sólidos, sin degradados.
+- Inicio con la marca M, subtítulo «Tus finanzas, en orden» y tarjeta de balance
+  con icono de billetera y cifras jerarquizadas.
+- Gráfica de flujo en verde/rojo, movimientos recientes con iconos tintados por
+  categoría y barra inferior con el FAB azul.
+- Pantalla de acceso rediseñada con la misma marca y el nuevo acento.
+- El tema oscuro pasa a ser el predeterminado; el tema claro sigue disponible y
+  se conserva la preferencia guardada.
+- La franja del notch y las barras del sistema usan el color del tema activo.
+
+### Icono y pantallas de inicio
+- Nuevo icono: monograma M plegado con paneles azules sobre fondo oscuro.
+- Iconos legacy, redondos y adaptativos regenerados en todas las densidades.
+- Splash con la marca, el nombre y el lema, acorde con el nuevo diseño.
+
+### Ajustes internos
+- `color-scheme` se limita al acceso y sigue al tema de la app, para que los
+  selectores y el selector de fecha nativos se vean correctos en ambos temas.
+- Los montos del desglose por categoría usan color neutro: el verde/rojo queda
+  reservado para ingresos y gastos.
+- Se retiraron los brillos verdes heredados de la versión anterior en deudas
+  liquidadas.
+
 ## [1.1.0] — 2026-11-04
 
 ### Desbloqueo biométrico
