@@ -398,6 +398,7 @@ Lista de verificación normativa (aplica a cada componente):
 
 | Versión | Cambio |
 |---|---|
+| 1.0.5-draft | `app.css` deja de duplicar valores de tema: sus variables históricas (`--bg`, `--card`, `--ink`, `--accent`, `--line`, `--pos`, `--neg`, `--alert` y `--track`) apuntan a tokens semánticos; `--shadow-*` se hereda de `design-tokens.css`. |
 | 1.0.4-draft | La app carga una copia generada de los tokens (`www/design-tokens.css`) mediante `npm run sync:tokens`; el logotipo oficial (principal/positiva) sustituye al monograma SVG en acceso e Inicio. |
 | 1.0.3-draft | Decisiones resueltas D-01, D-02, D-03, D-04 y D-07; confirmadas D-18 a D-21. Se añadieron alias de dominio (`--color-summary`, `--color-capital`, `--color-settled`, `--color-transfer`, `--color-petty-cash`, `--color-contribution`) sin valores nuevos. Abono usa `--color-contribution` (excepción documentada). |
 | 1.0.2-draft | Decisiones del responsable: D-18 (grafía METRIA/Metria sin acento), D-19 (se mantiene turquesa/navy), D-20 y D-21 confirmadas. |

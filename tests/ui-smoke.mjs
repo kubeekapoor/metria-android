@@ -42,6 +42,30 @@ try {
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 
+  /* Compara las variables históricas de app.css con los tokens semánticos
+     resolviéndolas en un elemento real (getComputedStyle devuelve el color). */
+  const baseColorMismatches = () => page.evaluate(() => {
+    const resolve = (name) => {
+      const el = document.createElement('span');
+      el.style.color = `var(${name})`;
+      document.body.appendChild(el);
+      const color = getComputedStyle(el).color;
+      el.remove();
+      return color;
+    };
+    const pairs = [
+      ['--bg', '--color-bg'], ['--card', '--color-surface-1'], ['--card-alt', '--color-surface-2'],
+      ['--ink', '--color-text-primary'], ['--ink-dim', '--color-text-secondary'], ['--ink-faint', '--color-text-muted'],
+      ['--line', '--color-border'], ['--line-strong', '--color-border-control'],
+      ['--accent', '--color-action-primary'], ['--on-accent', '--color-text-on-accent'],
+      ['--pos', '--color-income'], ['--neg', '--color-expense'], ['--alert', '--color-warning'],
+      ['--track', '--color-surface-3'],
+    ];
+    return pairs
+      .filter(([legacy, token]) => resolve(legacy) !== resolve(token))
+      .map(([legacy, token]) => `${legacy} != ${token}`);
+  });
+
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=Crea tu contraseña', { timeout: 15000 });
   const authBrand = ((await page.textContent('.auth-brand')) || '').trim();
@@ -93,6 +117,8 @@ try {
   } else if (homeLogo.shown !== 'logo-dark') {
     fail('El tema oscuro debe mostrar el logotipo principal: ' + homeLogo.shown);
   }
+  const darkBaseMismatches = await baseColorMismatches();
+  if (darkBaseMismatches.length) fail('Variables base sin token en tema oscuro: ' + darkBaseMismatches.join(', '));
   await page.evaluate(() => document.fonts.ready);
   const fonts = await page.evaluate(() => ({
     body: getComputedStyle(document.body).fontFamily,
@@ -145,6 +171,8 @@ try {
       .find(img => getComputedStyle(img).display !== 'none')?.getAttribute('src') || '';
   });
   if (!visibleLogoSrc.includes('metria-logo-positiva.png')) fail('El tema claro debe mostrar el logotipo positivo: ' + visibleLogoSrc);
+  const lightBaseMismatches = await baseColorMismatches();
+  if (lightBaseMismatches.length) fail('Variables base sin token en tema claro: ' + lightBaseMismatches.join(', '));
   console.log('✔ El tema cambia con un toque y el logotipo también');
 
   await page.tap('.tabbar [data-page="ajustes"]');
