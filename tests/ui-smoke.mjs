@@ -44,6 +44,8 @@ try {
 
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=Crea tu contraseña', { timeout: 15000 });
+  const authBrand = ((await page.textContent('.auth-brand')) || '').trim();
+  if (!authBrand.includes('METRIA') || authBrand.includes('METRÍA')) fail('El wordmark del acceso no es METRIA: ' + authBrand);
   await page.screenshot({ path: '/tmp/metria-01-crear.png' });
 
   await page.fill('#password', 'clave-de-prueba');
@@ -59,6 +61,8 @@ try {
   await page.click('button[type=submit]');
   await page.waitForSelector('text=Balance actual', { timeout: 30000 });
   await page.waitForSelector('nav', { timeout: 5000 });
+  const homeBrand = ((await page.textContent('.brand-text h1')) || '').trim();
+  if (homeBrand !== 'METRIA') fail('El wordmark de Inicio no es METRIA: ' + homeBrand);
   await page.evaluate(() => document.fonts.ready);
   const fonts = await page.evaluate(() => ({
     body: getComputedStyle(document.body).fontFamily,

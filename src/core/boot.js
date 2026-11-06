@@ -1,4 +1,4 @@
-/* Arranque de Metría en Android.
+/* Arranque de Metria en Android.
  *
  * 1. Espera el puente de Capacitor y elige el almacenamiento.
  * 2. Hace el respaldo de arranque (cifrado, sin necesitar la contraseña).
@@ -82,7 +82,7 @@ async function enterApp() {
     entering = false;
     authRoot.hidden = false;
     appRoot.hidden = true;
-    if (ui) ui.showError('No se pudo cargar la aplicación. Cierra Metría y vuelve a abrirla.');
+    if (ui) ui.showError('No se pudo cargar la aplicación. Cierra Metria y vuelve a abrirla.');
     return;
   }
   entering = false;
@@ -159,6 +159,6 @@ async function boot() {
 boot().catch(e => {
   console.error(e);
   document.getElementById('auth').innerHTML =
-    '<div class="auth-wrap"><div class="auth-card"><div class="auth-brand">Metría</div>'
-    + '<h1>No se pudo iniciar</h1><p class="sub">Cierra Metría y vuelve a abrirla.</p></div></div>';
+    '<div class="auth-wrap"><div class="auth-card"><div class="auth-brand">METRIA</div>'
+    + '<h1>No se pudo iniciar</h1><p class="sub">Cierra Metria y vuelve a abrirla.</p></div></div>';
 });

@@ -5,14 +5,14 @@
 
 const nextPaint = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-/* La marca de Metría: monograma M plegado, igual que el ícono de la app. */
+/* La marca de Metria: monograma M plegado, igual que el ícono de la app. */
 const BRAND_MARK = `<svg class="brand-mark auth-logo" viewBox="0 0 64 64" aria-hidden="true">
   <polygon points="0,7.7 9,2.6 9,58.9 0,64" fill="var(--auth-accent)" opacity=".72"/>
   <polygon points="9,2.6 32,28.2 32,35.8 9,10.2" fill="var(--auth-accent)"/>
   <polygon points="32,28.2 55,2.6 55,10.2 32,35.8" fill="var(--auth-accent)" opacity=".86"/>
   <polygon points="55,2.6 64,7.7 64,64 55,58.9" fill="var(--auth-accent)" opacity=".62"/>
 </svg>`;
-const BRAND = `<div class="auth-brand">${BRAND_MARK}<span>Metría</span></div>`;
+const BRAND = `<div class="auth-brand">${BRAND_MARK}<span>METRIA</span></div>`;
 
 export class AuthUI {
   constructor(root, handlers) {
@@ -26,7 +26,7 @@ export class AuthUI {
   setVersion(v) {
     this.version = v || this.version;
     const el = this.root.querySelector('[data-version]');
-    if (el) el.textContent = `Metría v${this.version}`;
+    if (el) el.textContent = `Metria v${this.version}`;
   }
 
   shell(title, subtitle, body, footer = '') {
@@ -42,7 +42,7 @@ export class AuthUI {
           <div class="error" data-error></div>
           ${footer}
         </div>
-        <div class="auth-ver" data-version>Metría v${this.version}</div>
+        <div class="auth-ver" data-version>Metria v${this.version}</div>
       </div>`;
     return {
       error: this.root.querySelector('[data-error]'),

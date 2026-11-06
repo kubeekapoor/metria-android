@@ -86,7 +86,7 @@ export async function saveFile(text, filename) {
     await Share.share({
       title: filename,
       files: [uri],
-      dialogTitle: 'Guardar respaldo de Metría',
+      dialogTitle: 'Guardar respaldo de Metria',
     });
   } catch (e) {
     /* El usuario canceló la hoja de compartir: no es un error de la app. */

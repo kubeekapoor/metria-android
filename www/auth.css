@@ -62,7 +62,6 @@ body {
   font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 14px;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
   font-weight: 700;
   color: var(--auth-ink);
   margin-bottom: 18px;

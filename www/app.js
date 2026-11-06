@@ -1,4 +1,4 @@
-/* Metría — interfaz y reglas de negocio (extraído de app.html del escritorio).
+/* Metria — interfaz y reglas de negocio (extraído de app.html del escritorio).
    Se ejecuta dentro de un IIFE: no expone nada salvo window.MetriaApp. */
 (function () {
 const CATEGORIES = [
@@ -357,7 +357,7 @@ function saveAll(){
 }
 async function loadTheme(){
   const raw = await storageGet('theme');
-  /* La identidad de Metría es oscura; el tema claro sigue disponible. */
+  /* La identidad de Metria es oscura; el tema claro sigue disponible. */
   state.theme = raw === 'light' ? 'light' : 'dark';
   state.hideBalance = (await storageGet('hidebalance')) === '1';
   state.flowStyle = (await storageGet('flowstyle')) === 'barras' ? 'barras' : 'linea';
@@ -474,7 +474,7 @@ function importBackup(ev){
   if(!file) return;
   if(file.size > 20 * 1024 * 1024){
     input.value = '';
-    showNotice('Archivo demasiado grande', 'Ese archivo no parece un respaldo de Metría.');
+    showNotice('Archivo demasiado grande', 'Ese archivo no parece un respaldo de Metria.');
     return;
   }
   const reader = new FileReader();
@@ -496,17 +496,17 @@ function processImport(obj){
   let clean = null;
   try{ clean = sanitizeBackup(obj); }catch(e){ clean = null; }
   if(!clean){
-    showNotice('Archivo no válido', 'Ese archivo no es un respaldo de Metría. Tus datos actuales no se tocaron.');
+    showNotice('Archivo no válido', 'Ese archivo no es un respaldo de Metria. Tus datos actuales no se tocaron.');
     return;
   }
   if(clean.unsupported){
-    showNotice('Respaldo no compatible', `Este respaldo tiene ${clean.unsupported} movimiento${clean.unsupported===1?'':'s'} de tipos que Metría ya no admite (Inversión, Impuestos o ajustes de cierre). No se importó nada y tus datos actuales no se tocaron.`);
+    showNotice('Respaldo no compatible', `Este respaldo tiene ${clean.unsupported} movimiento${clean.unsupported===1?'':'s'} de tipos que Metria ya no admite (Inversión, Impuestos o ajustes de cierre). No se importó nada y tus datos actuales no se tocaron.`);
     return;
   }
   const bal = balancesMap(clean.entries, clean.paymentMethods);
   const negativa = clean.paymentMethods.find(m => bal[m.id] < 0);
   if(negativa){
-    showNotice('Respaldo no válido', `En este respaldo la cuenta "${negativa.name}" quedaría con saldo negativo (${fmt(bal[negativa.id])}). Metría no admite cuentas en negativo, así que no se importó nada y tus datos actuales no se tocaron.`);
+    showNotice('Respaldo no válido', `En este respaldo la cuenta "${negativa.name}" quedaría con saldo negativo (${fmt(bal[negativa.id])}). Metria no admite cuentas en negativo, así que no se importó nada y tus datos actuales no se tocaron.`);
     return;
   }
   const hasCurrent = state.entries.length || state.debts.length || state.paymentMethods.length;
@@ -1654,7 +1654,7 @@ function renderHome(){
   return `
     <div class="hd">
       <div class="brand-lockup">${logoMark('brand-mark')}
-        <div class="brand-text"><h1>Metría</h1><p class="brand-sub">Tus finanzas, en orden</p></div>
+        <div class="brand-text"><h1>METRIA</h1><p class="brand-sub">Tus finanzas, en orden</p></div>
       </div>
       <button class="theme-toggle" id="theme-toggle" title="Cambiar apariencia">${ic(state.theme==='dark'?'sun':'moon')}</button>
     </div>
@@ -2007,7 +2007,7 @@ let appVersion = '';
 if(window.appInfo) window.appInfo.version().then(v => {
   appVersion = v || '';
   const el = document.getElementById('app-version');
-  if(el) el.textContent = 'Metría' + (appVersion ? ' v' + appVersion : '');
+  if(el) el.textContent = 'Metria' + (appVersion ? ' v' + appVersion : '');
 }).catch(() => {});
 
 function renderAjustes(){
@@ -2040,7 +2040,7 @@ function renderAjustes(){
 
     <div class="panel">
       <p class="panel-title"><span class="dot" style="background:#636366"></span>Acerca de</p>
-      <p class="hint" id="app-version" style="margin:0;">Metría${appVersion ? ' v' + esc(appVersion) : ''}</p>
+      <p class="hint" id="app-version" style="margin:0;">Metria${appVersion ? ' v' + esc(appVersion) : ''}</p>
     </div>
     <div class="panel">
       <p class="panel-title"><span class="dot" style="background:var(--c-gasto)"></span>Zona de riesgo</p>
