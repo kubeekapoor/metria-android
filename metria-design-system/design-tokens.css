@@ -2,9 +2,9 @@
    Metria — design-tokens.css  (v1.0.0-draft)
    Fuente única de verdad de los valores visuales.
    - Nombres en inglés, comentarios en español.
-   - Tema oscuro = tema principal (valores por defecto en :root).
-   - Tema claro = [data-theme="light"] (mecanismo propuesto; ver
-     Design-System-Metria.md §7 "Decisiones pendientes").
+   - Tema oscuro = tema principal (valores por defecto en :root y
+     data-theme="dark" en <html>).
+   - Tema claro = :root[data-theme="light"] (decisión D-01).
    - Sin transparencias decorativas: todo color es sólido. Las únicas
      excepciones son el scrim de modales y el anillo de foco (ver abajo).
    - Contrastes calculados (WCAG 2.x) y documentados en Design-System-Metria.md §5.
@@ -273,6 +273,29 @@
   --shadow-lg: 0 12px 32px #B8C4CD;
 
   --color-scrim: rgba(17, 24, 32, 0.56);
+}
+
+/* --------------------------------------------------------------------------
+   3.1 ALIAS DE DOMINIO (decisión de producto; no crean valores nuevos)
+   Los componentes usan estos alias y no reutilizan estados de interacción
+   para nombrar dominios. Todos heredan el tema activo mediante los tokens
+   semánticos a los que apuntan.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Resumen, capital y deudas liquidadas: grises. */
+  --color-summary: var(--color-text-secondary);
+  --color-capital: var(--color-text-secondary);
+  --color-settled: var(--color-text-muted);
+
+  /* Transferencias: información. */
+  --color-transfer: var(--color-info);
+
+  /* Caja chica: mismo tono que el estado activo. */
+  --color-petty-cash: var(--color-active);
+
+  /* Ingreso y abono comparten color; el abono es una excepción documentada
+     frente a la recomendación anterior de usar --color-debt. */
+  --color-contribution: var(--color-income);
 }
 
 /* --------------------------------------------------------------------------

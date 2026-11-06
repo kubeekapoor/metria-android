@@ -60,6 +60,7 @@ Fuente normativa: **Manual básico de identidad gráfica v1.0 (noviembre 2026)**
 
 - **[OBLIGATORIO]** Área de protección: **2x** libre alrededor, donde **x = ancho de una barra** del logotipo. Ningún texto, imagen o borde invade esa zona.
 - **[OBLIGATORIO]** Tamaño mínimo: **32 px de ancho** en digital (`--logo-min-width-digital`); 15 mm en impresión.
+- **[RESUELTA]** Para la app se usan los PNG oficiales de `www/assets/logo/`: `metria-logo-principal.png` sobre fondos oscuros y `metria-logo-positiva.png` sobre fondos claros. El lienzo mide 927 × 862 px y el contenido visible 655 × 590 px; se renderiza a ~46 px de ancho para que el símbolo visible mida ~32 px. El ícono del lanzador y el splash de Android quedan fuera de este alcance.
 - **[OBLIGATORIO]** Usos incorrectos (manual §05): no deformar proporciones, no rotar ni inclinar, no cambiar colores, no usar sobre fondos sin contraste, no agregar sombras/brillos/bordes, no espejar ni invertir.
 - **[OBLIGATORIO]** El degradado (`--brand-gradient`) se reserva al logotipo y a elementos específicos de identidad (pantalla de acceso/splash, "Acerca de", ícono de la app, franja de cuatro tramos del manual).
 - **[OBLIGATORIO]** El degradado **no** se usa en botones, tarjetas, fondos, gráficas ni barras de progreso.
@@ -134,12 +135,26 @@ Kraken se usa como **referencia conceptual de experiencia**, no de identidad. Co
 | Activo / seleccionado | `--color-active`, `--color-selected-*` | `--color-active-bg` | `#30E3CA` / `#0B2E2A` | `#006B5E` / `#DDF3EF` |
 | Deshabilitado | `--color-text-disabled` | `--color-disabled-bg` | `#5A6672` / `#15191E` | `#8A98A3` / `#EDF1F4` |
 
+**Dominios de la app (alias, sin valores nuevos):**
+
+| Dominio | Token | Equivale a |
+|---|---|---|
+| Ingreso | `--color-income` | `#34D399` / `#097048` |
+| Abono | `--color-contribution` | `--color-income` |
+| Gasto | `--color-expense` | `#FF6B7A` / `#C4283C` |
+| Deuda | `--color-debt` | `#C98BFF` / `#8E2CB0` |
+| Transferencia | `--color-transfer` | `--color-info` |
+| Caja chica | `--color-petty-cash` | `--color-active` |
+| Resumen | `--color-summary` | `--color-text-secondary` |
+| Capital | `--color-capital` | `--color-text-secondary` |
+| Liquidadas | `--color-settled` | `--color-text-muted` |
+
 Reglas:
 
 - **[OBLIGATORIO]** El color **nunca** es el único portador de significado. Ingreso/gasto/deuda se acompañan de **etiqueta, signo (+/−) o icono**.
 - **[OBLIGATORIO]** Gasto (`expense`) y error (`error`) son tonos cercanos. **Un gasto no es un error**: no usar `--color-error` para montos de gasto, ni `--color-expense` para validaciones.
-- **[RECOMENDADO]** Reservar `--color-debt` (violeta) exclusivamente al dominio de deudas, abonos y saldo pendiente.
-- **[PENDIENTE]** El tono de deudas (violeta) es **propuesta**: el brief no lo definió. Ver §14 D-02.
+- **[RECOMENDADO]** Reservar `--color-debt` (violeta) exclusivamente al dominio de deudas y saldo pendiente. **Excepción aprobada:** los abonos usan `--color-contribution`, que equivale a `--color-income`; no se pintan con `--color-debt`.
+- **[RESUELTA — D-02]** El tono de deudas (violeta) queda confirmado por el responsable: `#C98BFF` en oscuro y `#8E2CB0` en claro. Ver §14 D-02.
 
 ### 5.3 Evaluación de contraste (calculada, WCAG 2.x)
 
@@ -204,7 +219,7 @@ Casos de botón relleno:
 - **[OBLIGATORIO]** No inferir un tema desde el otro invirtiendo colores: usar el valor declarado de cada token.
 - **[OBLIGATORIO]** Acción primaria: turquesa con texto negro (oscuro) · navy con texto blanco (claro).
 - **[RECOMENDADO]** Las sombras en oscuro son casi imperceptibles; confiar en el escalón de superficie y el borde.
-- **[PENDIENTE]** Mecanismo de cambio de tema: se propone `data-theme="dark|light"` en `<html>`, mapeado al ajuste "Modo claro/oscuro" existente. Ver §14 D-01.
+- **[RESUELTA — D-01]** Mecanismo de cambio de tema: `data-theme="dark|light"` en `<html>`, con oscuro por defecto y mapeado al ajuste "Modo claro/oscuro" existente. La pantalla de acceso permanece siempre oscura.
 
 ---
 
@@ -232,7 +247,7 @@ Reglas:
 - **[OBLIGATORIO]** Montos, balances y columnas numéricas usan cifras tabulares (`.num` / `[data-numeric]`) y alineación a la derecha en tablas.
 - **[OBLIGATORIO]** Formato monetario único en toda la app (símbolo, separador de miles y decimales). **[PENDIENTE]** Formato exacto (moneda y locale) a confirmar contra la app: D-05.
 - **[OBLIGATORIO]** Pesos permitidos solo los de la tabla de familias (Montserrat 600/700; Roboto 400/500). No cargar ni usar otros.
-- **[OBLIGATORIO]** Las fuentes deben estar **empaquetadas localmente** (la app no solicita permiso de INTERNET y usa CSP restrictiva; no usar Google Fonts remotos). **[PENDIENTE]** Verificar si ya están incluidas: D-03.
+- **[OBLIGATORIO]** Las fuentes deben estar **empaquetadas localmente** (la app no solicita permiso de INTERNET y usa CSP restrictiva; no usar Google Fonts remotos). **[RESUELTA — D-03]** Se incluyen Montserrat 600/700 y Roboto 400/500 en `www/fonts/` y se declaran con `@font-face` locales.
 - **[RECOMENDADO]** Ancho de línea de texto corrido ≤ 70 caracteres (`--layout-content-narrow`).
 - **[RECOMENDADO]** Mayúsculas sostenidas solo en etiquetas de 12 px; evitar en textos largos.
 
@@ -352,22 +367,22 @@ Lista de verificación normativa (aplica a cada componente):
 
 ---
 
-## 14. Decisiones pendientes de validación
+## 14. Decisiones de validación y acuerdos
 
-| ID | Decisión | Por qué está pendiente | Propuesta provisional |
+| ID | Decisión | Estado | Detalle |
 |---|---|---|---|
-| D-01 | Mecanismo de tema | Se desconoce cómo `app.js` aplica hoy claro/oscuro. | Atributo `data-theme` en `<html>`; migrar sin cambiar la lógica del ajuste. |
-| D-02 | Color de deudas (violeta) | El brief no lo define. | `--color-debt` violeta; revisar visualmente en la app. |
-| D-03 | Fuentes locales | CSP restrictiva y sin INTERNET: no pueden cargarse en línea. | Incluir Montserrat 600/700 y Roboto 400/500 en `www/` y declararlas con `@font-face`. |
-| D-04 | "Tamaño de vista" | No se conoce su implementación. | Que modifique `font-size` raíz y todo use `rem`; confirmar. |
-| D-05 | Formato monetario | Moneda y *locale* no documentados. | Centralizar en una sola función de formato. |
-| D-06 | Navegación en tablet | Depende de la estructura real de pantallas. | Barra inferior hasta 1023 px. |
-| D-07 | Mapeo de tokens a `app.css` / `auth.css` existentes | No se inspeccionó el CSS actual. | Tabla de equivalencias antes de migrar (ver AI-Implementation-Rules §6). |
-| D-08 | Sombras en tema oscuro | Su efecto visible es mínimo. | Mantener y evaluar; apoyarse en el escalón de superficie. |
-| D-18 | Nombre | **Resuelta:** grafía sin acento. Texto de interfaz y documentación: **Metria**; wordmark del logotipo: **METRIA** (mayúsculas). | El README del proyecto aún dice con acento; actualizarlo es opcional y fuera del alcance de estos documentos. |
-| D-19 | Color de botones y enlaces | **Resuelta:** se mantiene la opción más funcional por contraste: acción primaria turquesa (oscuro) / navy (claro). Desviación consciente del manual §06 (que asigna el cian a botones y enlaces). | El cian queda para información, serie 2 de gráficas e identidad. |
-| D-20 | Escala tipográfica | **Confirmada:** escala del brief (48/30/24/20/18/16/14/12) para la app; la del manual §08 (40/28/20/16/16/13) solo para web de marketing. | — |
-| D-21 | Proporción de color | **Confirmada:** la proporción del manual (35/30/20/10/5) es guía para piezas de marca; en la UI dominan las superficies neutras. | — |
+| D-01 | Mecanismo de tema | **Resuelta** | `data-theme="dark\|light"` en `<html>`, oscuro por defecto. La pantalla de acceso permanece siempre oscura. |
+| D-02 | Color de deudas (violeta) | **Resuelta** | Se confirma `--color-debt` violeta (`#C98BFF` oscuro / `#8E2CB0` claro). |
+| D-03 | Fuentes locales | **Resuelta** | Montserrat 600/700 y Roboto 400/500 desde `www/fonts/`, declaradas con `@font-face`. |
+| D-04 | "Tamaño de vista" | **Resuelta** | Se mantiene `zoom` y se retira la escala 0.6x; la migración a `font-size` raíz + `rem` queda para una fase posterior. |
+| D-05 | Formato monetario | Pendiente | Moneda y *locale* no documentados. Propuesta: centralizar en una sola función de formato. |
+| D-06 | Navegación en tablet | Pendiente | Depende de la estructura real de pantallas. Propuesta: barra inferior hasta 1023 px. |
+| D-07 | Mapeo de tokens a `app.css` / `auth.css` existentes | **Resuelta** | Se aprueba la tabla de equivalencias de la auditoría como mapeo oficial; la migración se ejecuta por fases. |
+| D-08 | Sombras en tema oscuro | Pendiente | Su efecto visible es mínimo. Propuesta: mantener y evaluar; apoyarse en el escalón de superficie. |
+| D-18 | Nombre | **Resuelta** | Grafía sin acento. Texto de interfaz y documentación: **Metria**; wordmark del logotipo: **METRIA** (mayúsculas). |
+| D-19 | Color de botones y enlaces | **Resuelta** | Acción primaria turquesa (oscuro) / navy (claro). Desviación consciente del manual §06 (que asigna el cian a botones y enlaces). |
+| D-20 | Escala tipográfica | **Confirmada** | Escala del brief (48/30/24/20/18/16/14/12) para la app; la del manual §08 solo para web de marketing. |
+| D-21 | Proporción de color | **Confirmada** | La proporción del manual (35/30/20/10/5) es guía para piezas de marca; en la UI dominan las superficies neutras. |
 
 
 **Decisión D-19.** Se mantiene turquesa/navy como acción primaria y enlace. Motivo: el cian como texto o relleno sobre blanco da 2.5:1 y no sirve en el tema claro. Esta es una **desviación autorizada** del manual §06, no un error: no "corregirla" al cian.
@@ -381,6 +396,7 @@ Lista de verificación normativa (aplica a cada componente):
 
 | Versión | Cambio |
 |---|---|
+| 1.0.3-draft | Decisiones resueltas D-01, D-02, D-03, D-04 y D-07; confirmadas D-18 a D-21. Se añadieron alias de dominio (`--color-summary`, `--color-capital`, `--color-settled`, `--color-transfer`, `--color-petty-cash`, `--color-contribution`) sin valores nuevos. Abono usa `--color-contribution` (excepción documentada). |
 | 1.0.2-draft | Decisiones del responsable: D-18 (grafía METRIA/Metria sin acento), D-19 (se mantiene turquesa/navy), D-20 y D-21 confirmadas. |
 | 1.0.1-draft | Revisión contra el manual de identidad: se corrigió el área de protección del logotipo (2x, no "altura de una barra") y la dirección del degradado (horizontal); se agregaron versiones del logotipo, tamaño mínimo, usos incorrectos y decisiones D-18 a D-21. |
 | 1.0.0-draft | Primera versión. Ajustes de contraste: `text-muted` (ambos temas), `border-control` nuevo. |
