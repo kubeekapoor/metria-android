@@ -51,7 +51,7 @@ const state = {
   editingCatId: null,
   debts: [],
   paymentMethods: [],
-  theme: 'light',
+  theme: 'dark',
   uiScale: 1,
   loaded: false,
   activeCategory: 'ingreso',
@@ -370,7 +370,7 @@ async function saveFlowStyle(){ await storageSet('flowstyle', state.flowStyle); 
 async function saveHideBalance(){ await storageSet('hidebalance', state.hideBalance ? '1' : '0'); }
 async function saveTheme(){ await storageSet('theme', state.theme); }
 function applyTheme(){
-  document.body.setAttribute('data-theme', state.theme);
+  document.documentElement.setAttribute('data-theme', state.theme);
   /* Los íconos de la barra de estado deben contrastar con el tema de la app. */
   if(window.systemBars) window.systemBars.setTheme(state.theme);
 }

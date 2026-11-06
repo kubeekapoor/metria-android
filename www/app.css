@@ -1,21 +1,7 @@
 :root{
-    color-scheme: light;
-    /* Paleta moderna: azul sólido como acento, verde para ingresos, rojo para
-       gastos y ámbar para deudas. Sin degradados: cada superficie usa un color. */
-    --accent:#3E63F0; --on-accent:#FFFFFF;
-    --bg:#F3F4F8; --card:#FFFFFF; --card-alt:#ECEFF6;
-    --ink:#101218; --ink-dim:#5D6270; --ink-faint:#8B90A0;
-    --line:rgba(16,18,24,0.08); --line-strong:rgba(16,18,24,0.14);
-    --shadow-sm:0 1px 2px rgba(16,24,40,0.05);
-    --shadow-md:0 12px 30px rgba(16,24,40,0.08);
-    --pos:#0F9F6E; --neg:#E5484D; --alert:#D97706;
-    --c-ingreso:#18B47A; --c-gasto:#F2555A; --c-resumen:#4C6FFF; --c-deuda:#F5A524; --c-abono:#18B47A;
-    --c-transferencia:#8B5CF6; --c-cajachica:#14B8A6; --c-capital:#64748B; --c-liquidada:#64748B;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-    --mono:var(--sans);
-  }
-  body[data-theme="dark"]{
     color-scheme: dark;
+    /* Tema oscuro (principal): azul sólido como acento, verde para ingresos,
+       rojo para gastos y ámbar para deudas. Sin degradados. */
     --accent:#4C6FFF; --on-accent:#FFFFFF;
     --bg:#08080D; --card:#13141C; --card-alt:#1B1D27;
     --ink:#F4F5F9; --ink-dim:#A2A6B5; --ink-faint:#707585;
@@ -25,6 +11,21 @@
     --pos:#34D399; --neg:#FF5C64; --alert:#FFB020;
     --c-ingreso:#34D399; --c-gasto:#FF5C64; --c-resumen:#6D8BFF; --c-deuda:#FFB020; --c-abono:#34D399;
     --c-transferencia:#A78BFA; --c-cajachica:#2DD4BF; --c-capital:#8B95A7; --c-liquidada:#94A3B8;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:var(--sans);
+  }
+  :root[data-theme="light"]{
+    color-scheme: light;
+    /* Tema claro: mismos roles, valores declarados para superficies claras. */
+    --accent:#3E63F0; --on-accent:#FFFFFF;
+    --bg:#F3F4F8; --card:#FFFFFF; --card-alt:#ECEFF6;
+    --ink:#101218; --ink-dim:#5D6270; --ink-faint:#8B90A0;
+    --line:rgba(16,18,24,0.08); --line-strong:rgba(16,18,24,0.14);
+    --shadow-sm:0 1px 2px rgba(16,24,40,0.05);
+    --shadow-md:0 12px 30px rgba(16,24,40,0.08);
+    --pos:#0F9F6E; --neg:#E5484D; --alert:#D97706;
+    --c-ingreso:#18B47A; --c-gasto:#F2555A; --c-resumen:#4C6FFF; --c-deuda:#F5A524; --c-abono:#18B47A;
+    --c-transferencia:#8B5CF6; --c-cajachica:#14B8A6; --c-capital:#64748B; --c-liquidada:#64748B;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}

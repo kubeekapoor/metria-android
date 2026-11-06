@@ -91,9 +91,9 @@ try {
   /* ---------- interacción: cada control debe responder a UN toque ---------- */
   if (await page.locator('#toast').count() !== 1) fail('Falta el contenedor de avisos #toast');
 
-  const themeBefore = await page.getAttribute('body', 'data-theme');
+  const themeBefore = await page.getAttribute('html', 'data-theme');
   await page.tap('#theme-toggle');
-  await page.waitForFunction((t) => document.body.getAttribute('data-theme') !== t, themeBefore, { timeout: 5000 });
+  await page.waitForFunction((t) => document.documentElement.getAttribute('data-theme') !== t, themeBefore, { timeout: 5000 });
   console.log('✔ El tema cambia con un toque');
 
   await page.tap('.tabbar [data-page="ajustes"]');
