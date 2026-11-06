@@ -59,6 +59,17 @@ try {
   await page.click('button[type=submit]');
   await page.waitForSelector('text=Balance actual', { timeout: 30000 });
   await page.waitForSelector('nav', { timeout: 5000 });
+  await page.evaluate(() => document.fonts.ready);
+  const fonts = await page.evaluate(() => ({
+    body: getComputedStyle(document.body).fontFamily,
+    heading: getComputedStyle(document.querySelector('.hd h1')).fontFamily,
+    montserrat: document.fonts.check('700 16px Montserrat'),
+    roboto: document.fonts.check('400 16px Roboto'),
+  }));
+  if (!fonts.body.includes('Roboto') || !fonts.heading.includes('Montserrat') || !fonts.montserrat || !fonts.roboto) {
+    fail('Las fuentes locales no se aplicaron: ' + JSON.stringify(fonts));
+  }
+  console.log('✔ Montserrat y Roboto se cargan desde www/fonts');
   await page.screenshot({ path: '/tmp/metria-03-inicio.png' });
   console.log('✔ Cuenta creada y la interfaz financiera cargó');
 
