@@ -114,6 +114,8 @@ try {
   await page.tap('.tabbar [data-page="ajustes"]');
   await page.waitForSelector('#autolock-select', { timeout: 5000 });
 
+  if (await page.locator('[data-scale="0.6"]').count() !== 0) fail('La escala 0.6x se retiró y no debe aparecer');
+  if (await page.locator('.scale-opt').count() !== 4) fail('Deben quedar 4 opciones de escala');
   await page.tap('[data-scale="1.15"]');
   await page.waitForFunction(() => document.querySelector('[data-scale="1.15"]').classList.contains('active'), null, { timeout: 5000 });
   const zoom = await page.evaluate(() => document.documentElement.style.zoom);

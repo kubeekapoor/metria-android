@@ -362,7 +362,9 @@ async function loadTheme(){
   state.hideBalance = (await storageGet('hidebalance')) === '1';
   state.flowStyle = (await storageGet('flowstyle')) === 'barras' ? 'barras' : 'linea';
   const sc = parseFloat(await storageGet('uiscale'));
-  state.uiScale = UI_SCALES.includes(sc) ? sc : 1;
+  /* La escala 0.6x se retiró (D-04). Un valor guardado se presenta como 0.85x
+     sin reescribir el dato; solo se guarda de nuevo si el usuario cambia. */
+  state.uiScale = sc === 0.6 ? 0.85 : (UI_SCALES.includes(sc) ? sc : 1);
   applyTheme();
   applyUiScale();
 }
@@ -375,7 +377,7 @@ function applyTheme(){
   if(window.systemBars) window.systemBars.setTheme(state.theme);
 }
 /* Tamaño de la vista: 1x es el tamaño original; escala textos, elementos y secciones. */
-const UI_SCALES = [0.6, 0.85, 1, 1.15, 1.3];
+const UI_SCALES = [0.85, 1, 1.15, 1.3];
 const uiScaleLabel = v => (v === 1 ? '1' : v.toFixed(2)) + 'x';
 async function saveUiScale(){ await storageSet('uiscale', String(state.uiScale)); }
 function applyUiScale(){
