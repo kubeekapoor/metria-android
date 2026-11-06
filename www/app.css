@@ -9,9 +9,12 @@
     --line:var(--color-border); --line-strong:var(--color-border-control);
     --track:var(--color-surface-3);
     --pos:var(--color-income); --neg:var(--color-expense); --alert:var(--color-warning);
-    /* Los dominios se migran en la fase 7; hasta entonces conservan sus valores. */
-    --c-ingreso:#34D399; --c-gasto:#FF5C64; --c-resumen:#6D8BFF; --c-deuda:#FFB020; --c-abono:#34D399;
-    --c-transferencia:#A78BFA; --c-cajachica:#2DD4BF; --c-capital:#8B95A7; --c-liquidada:#94A3B8;
+    /* Dominios: mapa aprobado (sin valores nuevos). */
+    --c-ingreso:var(--color-income); --c-gasto:var(--color-expense);
+    --c-resumen:var(--color-summary); --c-deuda:var(--color-debt);
+    --c-abono:var(--color-contribution);
+    --c-transferencia:var(--color-transfer); --c-cajachica:var(--color-petty-cash);
+    --c-capital:var(--color-capital); --c-liquidada:var(--color-settled);
     --sans:var(--font-body);
     --heading:var(--font-heading);
     --mono:var(--font-body);
@@ -20,8 +23,6 @@
   :root[data-theme="light"]{
     color-scheme: light;
     /* Los tokens de tema claro se resuelven en design-tokens.css. */
-    --c-ingreso:#18B47A; --c-gasto:#F2555A; --c-resumen:#4C6FFF; --c-deuda:#F5A524; --c-abono:#18B47A;
-    --c-transferencia:#8B5CF6; --c-cajachica:#14B8A6; --c-capital:#64748B; --c-liquidada:#64748B;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}

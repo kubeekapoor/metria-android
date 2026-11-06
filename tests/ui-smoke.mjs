@@ -66,6 +66,28 @@ try {
       .map(([legacy, token]) => `${legacy} != ${token}`);
   });
 
+  /* Los dominios deben apuntar al mapa aprobado, no a valores literales. */
+  const domainColorMismatches = () => page.evaluate(() => {
+    const resolve = (name) => {
+      const el = document.createElement('span');
+      el.style.color = `var(${name})`;
+      document.body.appendChild(el);
+      const color = getComputedStyle(el).color;
+      el.remove();
+      return color;
+    };
+    const pairs = [
+      ['--c-ingreso', '--color-income'], ['--c-abono', '--color-income'],
+      ['--c-gasto', '--color-expense'], ['--c-deuda', '--color-debt'],
+      ['--c-transferencia', '--color-info'], ['--c-cajachica', '--color-active'],
+      ['--c-resumen', '--color-text-secondary'], ['--c-capital', '--color-text-secondary'],
+      ['--c-liquidada', '--color-text-muted'],
+    ];
+    return pairs
+      .filter(([legacy, token]) => resolve(legacy) !== resolve(token))
+      .map(([legacy, token]) => `${legacy} != ${token}`);
+  });
+
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.waitForSelector('text=Crea tu contraseña', { timeout: 15000 });
   const authBrand = ((await page.textContent('.auth-brand')) || '').trim();
@@ -81,6 +103,23 @@ try {
   } else if (Math.abs(authLogo.width - 46) > 0.5 || Math.abs(authLogo.width / authLogo.height - 927 / 862) > 0.01) {
     fail('El logotipo del acceso no respeta 46 px de ancho y la proporción 927:862: ' + JSON.stringify(authLogo));
   }
+  const authColors = await page.evaluate(() => {
+    const resolve = (name) => {
+      const el = document.createElement('span');
+      el.style.color = `var(${name})`;
+      document.body.appendChild(el);
+      const color = getComputedStyle(el).color;
+      el.remove();
+      return color;
+    };
+    return { accent: resolve('--auth-accent'), ink: resolve('--auth-accent-ink') };
+  });
+  if (authColors.accent !== 'rgb(48, 227, 202)' || authColors.ink !== 'rgb(0, 0, 0)') {
+    fail('El acceso debe usar turquesa #30E3CA con texto negro: ' + JSON.stringify(authColors));
+  }
+  await page.focus('#password');
+  const focusShadow = await page.evaluate(() => getComputedStyle(document.getElementById('password')).boxShadow);
+  if (!focusShadow.includes('48, 227, 202')) fail('El anillo de foco del acceso no es turquesa: ' + focusShadow);
   await page.screenshot({ path: '/tmp/metria-01-crear.png' });
 
   await page.fill('#password', 'clave-de-prueba');
@@ -119,6 +158,8 @@ try {
   }
   const darkBaseMismatches = await baseColorMismatches();
   if (darkBaseMismatches.length) fail('Variables base sin token en tema oscuro: ' + darkBaseMismatches.join(', '));
+  const darkDomainMismatches = await domainColorMismatches();
+  if (darkDomainMismatches.length) fail('Dominios sin token en tema oscuro: ' + darkDomainMismatches.join(', '));
   await page.evaluate(() => document.fonts.ready);
   const fonts = await page.evaluate(() => ({
     body: getComputedStyle(document.body).fontFamily,
@@ -173,6 +214,8 @@ try {
   if (!visibleLogoSrc.includes('metria-logo-positiva.png')) fail('El tema claro debe mostrar el logotipo positivo: ' + visibleLogoSrc);
   const lightBaseMismatches = await baseColorMismatches();
   if (lightBaseMismatches.length) fail('Variables base sin token en tema claro: ' + lightBaseMismatches.join(', '));
+  const lightDomainMismatches = await domainColorMismatches();
+  if (lightDomainMismatches.length) fail('Dominios sin token en tema claro: ' + lightDomainMismatches.join(', '));
   console.log('✔ El tema cambia con un toque y el logotipo también');
 
   await page.tap('.tabbar [data-page="ajustes"]');

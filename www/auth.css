@@ -8,8 +8,9 @@
   --auth-line: #2A2C38;
   --auth-ink: #F4F5F9;
   --auth-dim: #A2A6B5;
-  --auth-accent: #4C6FFF;
-  --auth-accent-ink: #FFFFFF;
+  --auth-accent: #30E3CA;
+  --auth-accent-ink: #000000;
+  --auth-focus-ring: rgba(48, 227, 202, 0.28);
   --auth-danger: #FF5C64;
   --auth-warn: #FFB020;
   --auth-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -111,7 +112,7 @@ body {
 #auth input:focus {
   outline: none;
   border-color: var(--auth-accent);
-  box-shadow: 0 0 0 3px rgba(76, 111, 255, 0.24);
+  box-shadow: 0 0 0 3px var(--auth-focus-ring);
 }
 
 #auth input.mono, #auth .recovery-box { font-family: var(--auth-mono); }
@@ -132,7 +133,7 @@ body {
   border: none;
   background: var(--auth-accent);
   color: var(--auth-accent-ink);
-  box-shadow: 0 10px 26px rgba(76, 111, 255, 0.28);
+  box-shadow: 0 10px 26px var(--auth-focus-ring);
 }
 
 #auth button.primary:disabled { opacity: 0.45; cursor: default; }
