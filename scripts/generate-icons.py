@@ -1,41 +1,63 @@
 #!/usr/bin/env python3
-"""Genera el ícono y las pantallas de inicio de Metría.
+"""Genera el ícono de lanzador y el splash de Android desde el logotipo oficial.
 
-La marca es un monograma M plegado, inspirado en el logo base y en la
-referencia visual: paneles sólidos en azul, sin degradados, sobre fondo oscuro.
-Los PNG se generan con remuestreo para que los bordes queden suaves.
+Fuente de la marca (no se recrea con dibujos propios):
+  - www/assets/logo/metria-logo-principal.png  (color, fondo oscuro)
+  - www/assets/logo/metria-logo-blanco.png     (silueta para iconos tematizados)
+
+Salidas:
+  - mipmap-*/ic_launcher.png y ic_launcher_round.png (Android 7–7.1)
+  - mipmap-*/ic_launcher_foreground.png (adaptive icon, 108 dp)
+  - mipmap-*/ic_launcher_monochrome.png (iconos tematizados de Android 13+)
+  - drawable-nodpi/splash_logo.png (solo el símbolo, sin wordmark)
+  - resources-icon.png (1024 px, ficha de tienda)
 
 Uso: python3 scripts/generate-icons.py
 """
 
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 RES = ROOT / "android" / "app" / "src" / "main" / "res"
-FONT_BOLD = "/usr/share/fonts/truetype/inter-zorin-os/Inter-Bold.ttf"
-FONT_REGULAR = "/usr/share/fonts/truetype/inter-zorin-os/Inter-Regular.ttf"
+LOGO_DIR = ROOT / "www" / "assets" / "logo"
 
-BG = "#0A0A12"
-INK = "#F4F5F9"
-DIM = "#707585"
-MARK = [
-    ([(0, 12), (14, 4), (14, 92), (0, 100)], "#2F49D1"),
-    ([(14, 4), (50, 44), (50, 56), (14, 16)], "#5B7CFF"),
-    ([(50, 44), (86, 4), (86, 16), (50, 56)], "#4463F5"),
-    ([(86, 4), (100, 12), (100, 100), (86, 92)], "#2A3FB8"),
-]
+# Valores de design-tokens.css (tema oscuro). El ícono no cambia con el tema.
+BG = "#08080D"
+
+# Zona segura del adaptive icon: 66 dp de diámetro sobre un lienzo de 108 dp.
+# El símbolo mide 50 dp de ancho, de modo que su punto más lejano al centro
+# queda dentro de esos 66 dp y ningún recorte del lanzador lo corta.
+ADAPTIVE_CONTENT = 50 / 108
+# En los iconos legacy no hay sangrado: el símbolo ocupa ~62 % del lienzo.
+LEGACY_CONTENT = 0.62
+ROUND_CONTENT = 0.58
+# Splash: solo el símbolo, centrado.
+SPLASH_CONTENT = 0.56
 
 
-def _draw_mark(draw, box, scale):
-    """Dibuja el monograma dentro de box=(x, y, ancho, alto)."""
-    x, y, w, h = box
+def load_symbol(path):
+    """Carga el PNG oficial y recorta el margen transparente del lienzo."""
+    image = Image.open(path).convert("RGBA")
+    bbox = image.split()[3].getbbox()
+    if bbox is None:
+        raise SystemExit(f"El logotipo no tiene píxeles visibles: {path}")
+    return image.crop(bbox)
 
-    def point(px, py):
-        return ((x + px / 100 * w) * scale, (y + py / 100 * h) * scale)
 
-    for points, color in MARK:
-        draw.polygon([point(px, py) for px, py in points], fill=color)
+COLOR_SYMBOL = load_symbol(LOGO_DIR / "metria-logo-principal.png")
+MONO_SYMBOL = load_symbol(LOGO_DIR / "metria-logo-blanco.png")
+
+
+def place_symbol(canvas, content_width, symbol=COLOR_SYMBOL):
+    """Centra el símbolo en el lienzo con el ancho visible indicado."""
+    width = max(1, round(content_width))
+    height = max(1, round(width * symbol.height / symbol.width))
+    scaled = symbol.resize((width, height), Image.LANCZOS)
+    x = (canvas.width - width) // 2
+    y = (canvas.height - height) // 2
+    canvas.alpha_composite(scaled, (x, y))
+    return canvas
 
 
 def _save(img, path, size):
@@ -44,76 +66,46 @@ def _save(img, path, size):
 
 
 def full_icon(size, shape="rounded"):
+    """Icono legacy con fondo horneado; el lanzador lo recorta si hace falta."""
     factor = 4 if size <= 512 else 2
-    canvas = size * factor
-    img = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
+    canvas_size = size * factor
+    img = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
     if shape == "circle":
-        draw.ellipse([0, 0, canvas - 1, canvas - 1], fill=BG)
+        draw.ellipse([0, 0, canvas_size - 1, canvas_size - 1], fill=BG)
+        content = canvas_size * ROUND_CONTENT
     else:
         draw.rounded_rectangle(
-            [0, 0, canvas - 1, canvas - 1],
-            radius=int(canvas * 0.225),
+            [0, 0, canvas_size - 1, canvas_size - 1],
+            radius=int(canvas_size * 0.225),
             fill=BG,
         )
+        content = canvas_size * LEGACY_CONTENT
 
-    mark = canvas * 0.51
-    _draw_mark(draw, ((canvas - mark) / 2, (canvas - mark) / 2, mark, mark), 1)
+    place_symbol(img, content)
     return img.resize((size, size), Image.LANCZOS)
 
 
-def foreground(size):
+def adaptive_foreground(size, symbol=COLOR_SYMBOL):
+    """Primer plano transparente del adaptive icon."""
     factor = 4 if size <= 432 else 2
-    canvas = size * factor
-    img = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-
-    # Zona segura del ícono adaptativo: la marca ocupa ~54 % del lienzo.
-    mark = canvas * 0.54
-    _draw_mark(draw, ((canvas - mark) / 2, (canvas - mark) / 2, mark, mark), 1)
+    canvas_size = size * factor
+    img = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
+    place_symbol(img, canvas_size * ADAPTIVE_CONTENT, symbol)
     return img.resize((size, size), Image.LANCZOS)
-
-
-def tracked_text(draw, xy, text, font, fill, tracking):
-    x, y = xy
-    for ch in text:
-        draw.text((x, y), ch, font=font, fill=fill)
-        x += draw.textlength(ch, font=font) + tracking
 
 
 def splash_logo(size=1024):
-    """Marca + nombre + lema sobre fondo transparente.
+    """Solo el símbolo sobre fondo transparente.
 
-    Se dibuja como un cuadrado y se centra desde Android con un layer-list,
-    así el logo no se deforma en pantallas de distinta proporción.
+    El fondo lo pone splash.xml con el color de tema; así no hay un cuadrado
+    oscuro visible sobre el fondo de arranque.
     """
     factor = 2
-    canvas = size * factor
-    img = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-
-    mark = canvas * 0.30
-    _draw_mark(draw, ((canvas - mark) / 2, canvas * 0.22, mark, mark), 1)
-
-    word_font = ImageFont.truetype(FONT_BOLD, int(canvas * 0.115))
-    word = "Metría"
-    word_w = draw.textlength(word, font=word_font)
-    draw.text(((canvas - word_w) / 2, canvas * 0.555), word, font=word_font, fill=INK)
-
-    tag_font = ImageFont.truetype(FONT_REGULAR, int(canvas * 0.028))
-    tag = "TUS FINANZAS, EN ORDEN"
-    tracking = canvas * 0.007
-    tag_w = sum(draw.textlength(ch, font=tag_font) for ch in tag) + (len(tag) - 1) * tracking
-    tracked_text(
-        draw,
-        ((canvas - tag_w) / 2, canvas * 0.705),
-        tag,
-        tag_font,
-        DIM,
-        tracking,
-    )
-
+    canvas_size = size * factor
+    img = Image.new("RGBA", (canvas_size, canvas_size), (0, 0, 0, 0))
+    place_symbol(img, canvas_size * SPLASH_CONTENT)
     return img.resize((size, size), Image.LANCZOS)
 
 
@@ -131,7 +123,12 @@ def main():
     for density, size in fg.items():
         folder = RES / f"mipmap-{density}"
         folder.mkdir(parents=True, exist_ok=True)
-        _save(foreground(size), folder / "ic_launcher_foreground.png", size)
+        _save(adaptive_foreground(size), folder / "ic_launcher_foreground.png", size)
+        _save(
+            adaptive_foreground(size, MONO_SYMBOL),
+            folder / "ic_launcher_monochrome.png",
+            size,
+        )
 
     print("Icono de recursos:")
     _save(full_icon(1024), ROOT / "resources-icon.png", 1024)

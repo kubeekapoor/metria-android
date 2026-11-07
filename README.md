@@ -8,9 +8,9 @@ Usa la misma interfaz y las mismas reglas financieras que la versión de escrito
 (Electron), con almacenamiento cifrado y respaldos compatibles entre ambas.
 
 - **Paquete:** `com.kubeekapoor.metria`
-- **Versión:** 1.2.0
+- **Versión:** 1.2.1
 - **Android mínimo:** 7.0 (API 24) · **objetivo:** Android 16 (API 36)
-- **APK de versión final:** `dist/metria-1.2.0-android.apk`
+- **APK de versión final:** `dist/metria-1.2.1-android.apk`
 
 ## Qué incluye
 
@@ -75,7 +75,7 @@ biométrico evita tener que hacerlo en cada apertura.
 
 ## Instalar el APK
 
-1. Copia `dist/metria-1.2.0-android.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/metria-1.2.1-android.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta "instalar apps de esta fuente" si Android lo pide.
 3. Al abrirlo por primera vez, crea tu contraseña maestra y guarda la frase de
    recuperación que te muestra.

@@ -1,6 +1,6 @@
 # Compilar el APK de Metría
 
-Guía completa para generar `dist/metria-1.2.0-android.apk` en Linux, sin `sudo`,
+Guía completa para generar `dist/metria-1.2.1-android.apk` en Linux, sin `sudo`,
 y para reproducirlo en GitHub Actions.
 
 ## 1. Requisitos
@@ -43,7 +43,7 @@ Hace, en orden:
    - `esbuild src/core/boot.js → www/dist/boot.js`
    - `cap sync android` (copia `www/` y registra plugins)
    - `./gradlew assembleRelease`
-3. Copia el APK a `dist/metria-1.2.0-android.apk`.
+3. Copia el APK a `dist/metria-1.2.1-android.apk`.
 
 Para saltar las pruebas:
 
@@ -109,8 +109,8 @@ Antes de compilar una versión nueva, sube ambos números en
 `android/app/build.gradle`:
 
 ```gradle
-versionCode 3          // entero; Android lo usa para decidir si actualiza
-versionName "1.2.0"    // el que ve el usuario
+versionCode 4          // entero; Android lo usa para decidir si actualiza
+versionName "1.2.1"    // el que ve el usuario
 ```
 
 Android rechaza instalar un APK con el mismo `versionCode` o menor sobre uno ya
@@ -121,14 +121,14 @@ versión visible.
 
 ```bash
 "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs \
-  dist/metria-1.2.0-android.apk
+  dist/metria-1.2.1-android.apk
 ```
 
 ### Ver el manifiesto final
 
 ```bash
 "$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest print \
-  dist/metria-1.2.0-android.apk | grep -E "allowBackup|Cleartext|permission|versionName"
+  dist/metria-1.2.1-android.apk | grep -E "allowBackup|Cleartext|permission|versionName"
 ```
 
 Debe mostrar `allowBackup="false"`, `fullBackupContent="false"`,
@@ -140,7 +140,7 @@ Debe mostrar `allowBackup="false"`, `fullBackupContent="false"`,
 Por cable (con depuración USB activada):
 
 ```bash
-"$ANDROID_HOME/platform-tools/adb" install -r dist/metria-1.2.0-android.apk
+"$ANDROID_HOME/platform-tools/adb" install -r dist/metria-1.2.1-android.apk
 ```
 
 O copia el APK al teléfono y ábrelo. Android pedirá permitir la instalación desde

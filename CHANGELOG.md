@@ -2,6 +2,19 @@
 
 Formato: `YYYY-MM-DD · área · cambio`.
 
+## [1.2.1] — 2026-11-06
+
+### Icono y pantalla de inicio
+- El icono del lanzador usa el logotipo oficial: M blanca y barras de turquesa
+  a azul sobre fondo `#08080D`.
+- Iconos legacy, redondos y adaptativos regenerados desde los PNG oficiales;
+  se añadió la capa monocroma para los iconos tematizados de Android 13+.
+- El splash muestra solo el símbolo, sin wordmark ni lema.
+- `versionName 1.2.1`, `versionCode 4`.
+
+### Interfaz
+- La leyenda inferior de la app pasa a «POWERED BY BRACCOS TEAM».
+
 ## [1.2.0] — 2026-11-04
 
 ### Nuevo diseño

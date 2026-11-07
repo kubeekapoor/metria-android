@@ -1,4 +1,4 @@
-# Backlog — Metría Android 1.2.0
+# Backlog — Metría Android 1.2.1
 
 Estados: **Pendiente** · **En curso** · **En revisión** (probado de forma
 automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
@@ -45,7 +45,7 @@ automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
 |---|---|---|---|
 | A8 | Exportar respaldo con hoja de compartir | En revisión | Contrato probado con plugins simulados; falta hoja real |
 | A9 | Importar respaldo con selector de archivos | En revisión | `beginExternalActivity` evita el bloqueo; falta selector real |
-| A10 | Íconos adaptativos y splash | Hecho | Provisionales |
+| A10 | Íconos adaptativos y splash | Hecho | Logotipo oficial desde 1.2.1 |
 | A11 | Firma release y actualizaciones | Hecho | Llave en `~/.metria-keys` |
 | A12 | Build local reproducible | Hecho | `scripts/build.sh` |
 | A13 | Cada botón e interruptor responde con un solo toque | En revisión | Se restauró `#toast` y se evitan repintados asíncronos; probado en UI con toques simulados |
@@ -77,7 +77,7 @@ Al conectar un teléfono o instalar el APK:
 15. Rotar el teléfono y abrir el teclado en un formulario.
 16. Revisar que la barra inferior y los modales respeten las safe areas.
 
-## Mejoras futuras (no bloquean 1.2.0)
+## Mejoras futuras (no bloquean 1.2.1)
 
 - Exportar a CSV/PDF.
 - Widget de saldo.

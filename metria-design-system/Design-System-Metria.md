@@ -62,7 +62,7 @@ Fuente normativa: **Manual básico de identidad gráfica v1.0 (noviembre 2026)**
 
 - **[OBLIGATORIO]** Área de protección: **2x** libre alrededor, donde **x = ancho de una barra** del logotipo. Ningún texto, imagen o borde invade esa zona.
 - **[OBLIGATORIO]** Tamaño mínimo: **32 px de ancho** en digital (`--logo-min-width-digital`); 15 mm en impresión.
-- **[RESUELTA]** Para la app se usan los PNG oficiales de `www/assets/logo/`: `metria-logo-principal.png` sobre fondos oscuros y `metria-logo-positiva.png` sobre fondos claros. El lienzo mide 927 × 862 px y el contenido visible 655 × 590 px; se renderiza a ~46 px de ancho para que el símbolo visible mida ~32 px. El ícono del lanzador y el splash de Android quedan fuera de este alcance.
+- **[RESUELTA]** Para la app se usan los PNG oficiales de `www/assets/logo/`: `metria-logo-principal.png` sobre fondos oscuros y `metria-logo-positiva.png` sobre fondos claros. El lienzo mide 927 × 862 px y el contenido visible 655 × 590 px; se renderiza a ~46 px de ancho para que el símbolo visible mida ~32 px. El ícono del lanzador usa el PNG principal sobre `#08080D`, con capa monocroma para los iconos tematizados; el splash usa solo el símbolo, sin wordmark.
 - **[OBLIGATORIO]** Usos incorrectos (manual §05): no deformar proporciones, no rotar ni inclinar, no cambiar colores, no usar sobre fondos sin contraste, no agregar sombras/brillos/bordes, no espejar ni invertir.
 - **[OBLIGATORIO]** El degradado (`--brand-gradient`) se reserva al logotipo y a elementos específicos de identidad (pantalla de acceso/splash, "Acerca de", ícono de la app, franja de cuatro tramos del manual).
 - **[OBLIGATORIO]** El degradado **no** se usa en botones, tarjetas, fondos, gráficas ni barras de progreso.
@@ -398,6 +398,7 @@ Lista de verificación normativa (aplica a cada componente):
 
 | Versión | Cambio |
 |---|---|
+| 1.0.7-draft | El icono del lanzador y el splash de Android se generan desde los PNG oficiales (`scripts/generate-icons.py`); se añadió capa monocroma para iconos tematizados y el splash quedó solo con el símbolo. |
 | 1.0.6-draft | Los dominios de `app.css` apuntan al mapa aprobado (`--c-deuda` → `--color-debt`, `--c-transferencia` → `--color-info`, etc.) y el acceso usa turquesa local `#30E3CA` con texto negro y anillo de foco turquesa. |
 | 1.0.5-draft | `app.css` deja de duplicar valores de tema: sus variables históricas (`--bg`, `--card`, `--ink`, `--accent`, `--line`, `--pos`, `--neg`, `--alert` y `--track`) apuntan a tokens semánticos; `--shadow-*` se hereda de `design-tokens.css`. |
 | 1.0.4-draft | La app carga una copia generada de los tokens (`www/design-tokens.css`) mediante `npm run sync:tokens`; el logotipo oficial (principal/positiva) sustituye al monograma SVG en acceso e Inicio. |

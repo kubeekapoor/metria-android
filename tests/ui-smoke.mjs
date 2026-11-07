@@ -137,6 +137,8 @@ try {
   await page.waitForSelector('nav', { timeout: 5000 });
   const homeBrand = ((await page.textContent('.brand-text h1')) || '').trim();
   if (homeBrand !== 'METRIA') fail('El wordmark de Inicio no es METRIA: ' + homeBrand);
+  const credit = ((await page.textContent('.app-credit')) || '').trim();
+  if (credit !== 'POWERED BY BRACCOS TEAM') fail('La leyenda inferior no es POWERED BY BRACCOS TEAM: ' + credit);
   const homeLogo = await page.evaluate(() => {
     const wrap = document.querySelector('.brand-lockup .brand-mark');
     if (!wrap) return null;

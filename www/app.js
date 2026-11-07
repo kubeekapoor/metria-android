@@ -2594,7 +2594,7 @@ function render(){
   if(state.loadError){
     body = `<div style="margin:12px 20px;padding:14px 16px;border-radius:14px;background:var(--card);border:1px solid var(--c-gasto);color:var(--c-gasto);font-size:13.5px;line-height:1.45;"><b>No se pudieron leer tus datos guardados.</b><br>Por seguridad la app no guardará nada nuevo, para no sobrescribirlos. Cierra y vuelve a abrir la app. Si el aviso continúa, restaura un respaldo desde Inicio → Respaldo → Importar.</div>` + body;
   }
-  body += `<p class="app-credit">Desarrollado por Kubee Kapoor (kubeekapoor@proton.me)</p>`;
+  body += `<p class="app-credit">POWERED BY BRACCOS TEAM</p>`;
   body += renderPmCloseModal();
   body += renderWipeModal();
   body += renderConfirmModal();
