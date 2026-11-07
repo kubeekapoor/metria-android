@@ -1,9 +1,9 @@
 {
   "name": "metria-android",
-  "productName": "Metría",
-  "version": "1.2.1",
+  "productName": "Metria",
+  "version": "1.2.2",
   "private": true,
-  "description": "Metría para Android - Control de finanzas personales (flujo de caja)",
+  "description": "Metria para Android - Control de finanzas personales (flujo de caja)",
   "type": "module",
   "scripts": {
     "sync": "npm run build:web && cap sync android",

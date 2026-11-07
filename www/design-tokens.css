@@ -31,6 +31,38 @@
   /* Área de protección = 2x, donde x = ancho de UNA barra del logotipo (depende
      del tamaño renderizado; se calcula, no es un token fijo). */
 
+  /* 1.1.1 Paleta de cuentas. Es un dato de usuario, no depende del tema.
+     app.js lee estos valores y guarda el hex resultante para conservar la
+     compatibilidad del data-store con el escritorio. */
+  --account-color-1: #4C6FFF;
+  --account-color-2: #18B47A;
+  --account-color-3: #F5A524;
+  --account-color-4: #F2555A;
+  --account-color-5: #8B5CF6;
+  --account-color-6: #14B8A6;
+  --account-color-7: #0EA5E9;
+  --account-color-8: #EC4899;
+  --account-color-9: #FFCC00;
+  --account-color-10: #64748B;
+
+  /* Texto/icono sobre un color de cuenta sólido. app.js elige uno según la
+     luminancia del color para garantizar contraste ≥ 4.5:1. */
+  --color-text-on-light-color: #000000;
+  --color-text-on-dark-color: #FFFFFF;
+
+  /* 1.1.2 Paleta del acceso. La pantalla de acceso es siempre oscura (D-01),
+     así que estos valores no dependen del tema de la app. */
+  --auth-color-bg: #08080D;
+  --auth-color-card: #13141C;
+  --auth-color-card-alt: #1B1D27;
+  --auth-color-line: #2A2C38;
+  --auth-color-ink: #F4F5F9;
+  --auth-color-dim: #A2A6B5;
+  --auth-color-accent: #30E3CA;
+  --auth-color-accent-ink: #000000;
+  --auth-color-danger: #FF5C64;
+  --auth-color-warn: #FFB020;
+
   /* 1.2 Tipografía */
   --font-heading: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;

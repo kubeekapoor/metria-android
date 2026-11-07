@@ -1,4 +1,4 @@
-# Arquitectura de Metría Android
+# Arquitectura de Metria Android
 
 Este documento explica cómo está armada la app, por qué se eligió Capacitor y
 dónde tocar cada cosa cuando quieras escalarla.

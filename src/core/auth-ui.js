@@ -13,7 +13,7 @@ export class AuthUI {
   constructor(root, handlers) {
     this.root = root;
     this.h = handlers;
-    this.version = handlers.version || '1.2.1';
+    this.version = handlers.version || '1.2.2';
     this.lastBiometric = { enabled: false };
     this.bioTimer = null;
   }

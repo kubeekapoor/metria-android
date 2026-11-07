@@ -2,17 +2,17 @@
    entra, app.css toma el control del resto de la interfaz. */
 
 :root {
-  --auth-bg: #08080D;
-  --auth-card: #13141C;
-  --auth-card-alt: #1B1D27;
-  --auth-line: #2A2C38;
-  --auth-ink: #F4F5F9;
-  --auth-dim: #A2A6B5;
-  --auth-accent: #30E3CA;
-  --auth-accent-ink: #000000;
-  --auth-focus-ring: rgba(48, 227, 202, 0.28);
-  --auth-danger: #FF5C64;
-  --auth-warn: #FFB020;
+  --auth-bg: var(--auth-color-bg);
+  --auth-card: var(--auth-color-card);
+  --auth-card-alt: var(--auth-color-card-alt);
+  --auth-line: var(--auth-color-line);
+  --auth-ink: var(--auth-color-ink);
+  --auth-dim: var(--auth-color-dim);
+  --auth-accent: var(--auth-color-accent);
+  --auth-accent-ink: var(--auth-color-accent-ink);
+  --auth-focus-ring: var(--auth-accent);
+  --auth-danger: var(--auth-color-danger);
+  --auth-warn: var(--auth-color-warn);
   --auth-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
@@ -51,9 +51,9 @@ body {
   max-width: 380px;
   padding: 26px 22px;
   background: var(--auth-card);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--auth-line);
   border-radius: 24px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 24px 60px var(--auth-accent-ink);
 }
 
 .auth-brand {
@@ -93,7 +93,7 @@ body {
 #auth label {
   display: block;
   font-size: 13px;
-  color: #C9CBD5;
+  color: var(--auth-dim);
   margin: 14px 0 6px;
 }
 
@@ -133,7 +133,7 @@ body {
   border: none;
   background: var(--auth-accent);
   color: var(--auth-accent-ink);
-  box-shadow: 0 10px 26px var(--auth-focus-ring);
+  box-shadow: 0 10px 26px var(--auth-accent-ink);
 }
 
 #auth button.primary:disabled { opacity: 0.45; cursor: default; }
@@ -158,8 +158,8 @@ body {
 }
 
 #auth .hint {
-  font-size: 11.5px;
-  color: #6E6E78;
+  font-size: var(--text-label-size);
+  color: var(--auth-dim);
   margin: 16px 0 0;
   line-height: 1.5;
 }
@@ -170,7 +170,7 @@ body {
   border: 1px solid var(--auth-line);
   border-radius: 14px;
   background: var(--auth-card-alt);
-  color: #FFD166;
+  color: var(--auth-warn);
   font-size: 15px;
   letter-spacing: 0.6px;
   text-align: center;
@@ -181,9 +181,9 @@ body {
 #auth .warn {
   margin-top: 14px;
   padding: 11px 12px;
-  border: 1px solid rgba(255, 159, 10, 0.3);
+  border: 1px solid var(--auth-warn);
   border-radius: 11px;
-  background: rgba(255, 159, 10, 0.1);
+  background: var(--auth-card-alt);
   color: var(--auth-warn);
   font-size: 12px;
   line-height: 1.5;
@@ -205,11 +205,11 @@ body {
 #auth .check-row label {
   margin: 0;
   font-size: 12.5px;
-  color: #C9C9D3;
+  color: var(--auth-dim);
   line-height: 1.45;
 }
 
 .auth-ver {
-  font-size: 11px;
-  color: #55555F;
+  font-size: var(--text-label-size);
+  color: var(--auth-dim);
 }

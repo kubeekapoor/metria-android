@@ -1,4 +1,4 @@
-# Backlog — Metría Android 1.2.1
+# Backlog — Metria Android 1.2.2
 
 Estados: **Pendiente** · **En curso** · **En revisión** (probado de forma
 automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
@@ -53,6 +53,7 @@ automatizada, falta dispositivo) · **Verificado** (probado en Android real) ·
 | A14 | Instalar y probar en teléfono físico | **Pendiente** | Bloqueado: no hay dispositivo conectado |
 | A15 | Desbloqueo con huella/rostro (Keystore + `BIOMETRIC_STRONG`) | En revisión | Plugin nativo y UI listos; falta `BiometricPrompt` real |
 | A16 | Autofill para Proton Pass y otros gestores | En revisión | Atributos HTML y WebView listos; falta probar la asociación real |
+| A17 | Tanda C de accesibilidad y sistema de diseño | Hecho | Sin `color-mix`, `backdrop-filter`, `rgba()` decorativo ni texto < 12 px; paleta de cuentas tokenizada y contraste de glifos calculado. Etiqueta visible «Metria» (D-18) |
 
 ## Prueba en dispositivo (checklist)
 
@@ -77,7 +78,7 @@ Al conectar un teléfono o instalar el APK:
 15. Rotar el teléfono y abrir el teclado en un formulario.
 16. Revisar que la barra inferior y los modales respeten las safe areas.
 
-## Mejoras futuras (no bloquean 1.2.1)
+## Mejoras futuras (no bloquean 1.2.2)
 
 - Exportar a CSV/PDF.
 - Widget de saldo.

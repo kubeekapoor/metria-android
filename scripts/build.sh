@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Compila el APK de versión final de Metría.
+# Compila el APK de versión final de Metria.
 #
 # Uso:
 #   ./scripts/build.sh            # pruebas + APK release
@@ -52,8 +52,8 @@ echo "== Compilando APK =="
 npm run build:apk
 
 mkdir -p dist
-cp android/app/build/outputs/apk/release/app-release.apk dist/metria-1.2.1-android.apk
+cp android/app/build/outputs/apk/release/app-release.apk dist/metria-1.2.2-android.apk
 
 echo
-echo "APK listo: dist/metria-1.2.1-android.apk"
-ls -lh dist/metria-1.2.1-android.apk
+echo "APK listo: dist/metria-1.2.2-android.apk"
+ls -lh dist/metria-1.2.2-android.apk

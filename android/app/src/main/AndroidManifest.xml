@@ -43,6 +43,6 @@
         </provider>
     </application>
 
-    <!-- Sin permiso de INTERNET: Metría funciona 100% sin red.
+    <!-- Sin permiso de INTERNET: Metria funciona 100% sin red.
          El WebView carga los archivos locales de la app. -->
 </manifest>

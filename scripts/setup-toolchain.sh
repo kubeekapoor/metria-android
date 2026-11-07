@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Instala el entorno de compilación de Metría Android sin sudo.
+# Instala el entorno de compilación de Metria Android sin sudo.
 #
 #   ./scripts/setup-toolchain.sh
 #

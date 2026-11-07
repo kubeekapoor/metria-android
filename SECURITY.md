@@ -1,6 +1,6 @@
 # Política de seguridad
 
-Metría maneja datos financieros personales. Si encuentras una vulnerabilidad,
+Metria maneja datos financieros personales. Si encuentras una vulnerabilidad,
 gracias por reportarla de forma privada.
 
 ## Cómo reportar
@@ -8,7 +8,7 @@ gracias por reportarla de forma privada.
 - Usa **Security → Report a vulnerability** en GitHub (GitHub Private
   Vulnerability Reporting). Es el canal preferido.
 - Alternativa: escribe a **kubeekapoor@proton.me** con el asunto
-  `[Metría Android] vulnerabilidad`.
+  `[Metria Android] vulnerabilidad`.
 - **No abras un issue público** con detalles explotables, datos financieros
   reales, contraseñas ni frases de recuperación.
 

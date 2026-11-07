@@ -1,16 +1,16 @@
-# Metría para Android
+# Metria para Android
 
 [![Build APK](https://github.com/kubeekapoor/metria-android/actions/workflows/build-apk.yml/badge.svg)](https://github.com/kubeekapoor/metria-android/actions/workflows/build-apk.yml)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 
-Aplicación Android de **Metría**, control de finanzas personales por flujo de caja.
+Aplicación Android de **Metria**, control de finanzas personales por flujo de caja.
 Usa la misma interfaz y las mismas reglas financieras que la versión de escritorio
 (Electron), con almacenamiento cifrado y respaldos compatibles entre ambas.
 
 - **Paquete:** `com.kubeekapoor.metria`
-- **Versión:** 1.2.1
+- **Versión:** 1.2.2
 - **Android mínimo:** 7.0 (API 24) · **objetivo:** Android 16 (API 36)
-- **APK de versión final:** `dist/metria-1.2.1-android.apk`
+- **APK de versión final:** `dist/metria-1.2.2-android.apk`
 
 ## Qué incluye
 
@@ -48,7 +48,7 @@ teléfono tenga una huella o rostro configurado y una biometría fuerte
 - No se guarda la contraseña: se cifra la llave maestra con una llave AES-256-GCM
   del Android Keystore que exige autenticación biométrica.
 - Si agregas una huella nueva o cambias la biometría, Android invalida esa llave.
-  Metría lo detecta, desactiva el acceso biométrico y pide la contraseña.
+  Metria lo detecta, desactiva el acceso biométrico y pide la contraseña.
 - Después de reiniciar el teléfono se pide la contraseña una vez; luego la
   biometría vuelve a funcionar durante ese arranque.
 - Si el teléfono solo tiene biometría débil, la opción no aparece.
@@ -56,8 +56,8 @@ teléfono tenga una huella o rostro configurado y una biometría fuerte
 
 ## Autofill con Proton Pass
 
-Metría es una WebView de Capacitor con origen `https://localhost`. El diálogo
-“Use login?” y la opción “Use always” son de Proton Pass, no de Metría.
+Metria es una WebView de Capacitor con origen `https://localhost`. El diálogo
+“Use login?” y la opción “Use always” son de Proton Pass, no de Metria.
 
 En 1.1.0 se prepararon los campos (`name`, `autocomplete`, atributos de
 contraseña) y la WebView (`IMPORTANT_FOR_AUTOFILL_YES` y
@@ -66,7 +66,7 @@ cambió el hostname `localhost`.**
 
 Si Proton Pass sigue sin recordar “Use always”, la limitación está en cómo el
 gestor asocia WebViews con `localhost`; no hay una forma fiable de forzarlo desde
-Metría. La contraseña se puede seguir pegando o escribiendo, y el desbloqueo
+Metria. La contraseña se puede seguir pegando o escribiendo, y el desbloqueo
 biométrico evita tener que hacerlo en cada apertura.
 
 > **Estado:** la lógica y la interfaz están probadas de forma automatizada. Falta
@@ -75,7 +75,7 @@ biométrico evita tener que hacerlo en cada apertura.
 
 ## Instalar el APK
 
-1. Copia `dist/metria-1.2.1-android.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/metria-1.2.2-android.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta "instalar apps de esta fuente" si Android lo pide.
 3. Al abrirlo por primera vez, crea tu contraseña maestra y guarda la frase de
    recuperación que te muestra.

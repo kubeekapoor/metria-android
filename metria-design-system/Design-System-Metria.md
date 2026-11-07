@@ -158,6 +158,16 @@ Reglas:
 - **[RECOMENDADO]** Reservar `--color-debt` (violeta) exclusivamente al dominio de deudas y saldo pendiente. **Excepción aprobada:** los abonos usan `--color-contribution`, que equivale a `--color-income`; no se pintan con `--color-debt`.
 - **[RESUELTA — D-02]** El tono de deudas (violeta) queda confirmado por el responsable: `#C98BFF` en oscuro y `#8E2CB0` en claro. Ver §14 D-02.
 
+**Paleta de cuentas (dato de usuario):**
+
+| Token | Valores | Uso |
+|---|---|---|
+| `--account-color-1…10` | `#4C6FFF`, `#18B47A`, `#F5A524`, `#F2555A`, `#8B5CF6`, `#14B8A6`, `#0EA5E9`, `#EC4899`, `#FFCC00`, `#64748B` | Colores elegibles para una cuenta. No dependen del tema y se guardan como hex en el `data-store` para conservar la compatibilidad con el escritorio. |
+| `--color-text-on-light-color` | `#000000` | Tinta sobre un color de cuenta claro. |
+| `--color-text-on-dark-color` | `#FFFFFF` | Tinta sobre un color de cuenta oscuro. |
+
+- **[OBLIGATORIO]** El glifo sobre el color de cuenta se elige por luminancia relativa (umbral 0.179) para mantener contraste ≥ 4.5:1; no se usa blanco fijo.
+
 ### 5.3 Evaluación de contraste (calculada, WCAG 2.x)
 
 Los ratios se calcularon con la fórmula de luminancia relativa de WCAG 2.x. Umbrales: texto normal ≥ 4.5:1; componentes de UI y gráficos ≥ 3:1.
@@ -221,7 +231,7 @@ Casos de botón relleno:
 - **[OBLIGATORIO]** No inferir un tema desde el otro invirtiendo colores: usar el valor declarado de cada token.
 - **[OBLIGATORIO]** Acción primaria: turquesa con texto negro (oscuro) · navy con texto blanco (claro).
 - **[RECOMENDADO]** Las sombras en oscuro son casi imperceptibles; confiar en el escalón de superficie y el borde.
-- **[RESUELTA — D-01]** Mecanismo de cambio de tema: `data-theme="dark|light"` en `<html>`, con oscuro por defecto y mapeado al ajuste "Modo claro/oscuro" existente. La pantalla de acceso permanece siempre oscura.
+- **[RESUELTA — D-01]** Mecanismo de cambio de tema: `data-theme="dark|light"` en `<html>`, con oscuro por defecto y mapeado al ajuste "Modo claro/oscuro" existente. La pantalla de acceso permanece siempre oscura y usa la paleta `--auth-color-*`, independiente del tema.
 
 ---
 
@@ -398,6 +408,7 @@ Lista de verificación normativa (aplica a cada componente):
 
 | Versión | Cambio |
 |---|---|
+| 1.0.8-draft | Tanda C: `app.css` y `auth.css` sin `color-mix()`, `backdrop-filter` ni transparencias decorativas; texto funcional mínimo de 12 px; paleta de cuentas tokenizada (`--account-color-1…10`) y tinta calculada por luminancia (`--color-text-on-light-color` / `--color-text-on-dark-color`). El nombre visible pasa a «Metria» (D-18). |
 | 1.0.7-draft | El icono del lanzador y el splash de Android se generan desde los PNG oficiales (`scripts/generate-icons.py`); se añadió capa monocroma para iconos tematizados y el splash quedó solo con el símbolo. |
 | 1.0.6-draft | Los dominios de `app.css` apuntan al mapa aprobado (`--c-deuda` → `--color-debt`, `--c-transferencia` → `--color-info`, etc.) y el acceso usa turquesa local `#30E3CA` con texto negro y anillo de foco turquesa. |
 | 1.0.5-draft | `app.css` deja de duplicar valores de tema: sus variables históricas (`--bg`, `--card`, `--ink`, `--accent`, `--line`, `--pos`, `--neg`, `--alert` y `--track`) apuntan a tokens semánticos; `--shadow-*` se hereda de `design-tokens.css`. |

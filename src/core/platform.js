@@ -4,7 +4,7 @@
 
 import { isNative } from './fs.js';
 
-export const APP_VERSION = '1.2.1';
+export const APP_VERSION = '1.2.2';
 
 let externalUntil = 0;
 let deps = {};

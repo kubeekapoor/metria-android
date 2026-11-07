@@ -273,7 +273,13 @@ try {
   await page.waitForFunction(() => [...document.querySelectorAll('.entry-detail')].some((e) => e.textContent.includes('Efectivo')), null, { timeout: 5000 });
   toast = (await page.textContent('#toast')) || '';
   if (!toast.includes('Cuenta disponible agregada')) fail('La cuenta no se agregó con un toque: ' + toast);
-  console.log('✔ La cuenta se agrega con un toque y conserva lo escrito');
+  const badgeInk = await page.evaluate(() => {
+    const row = [...document.querySelectorAll('.entry-row')].find((el) => el.textContent.includes('Efectivo'));
+    const badge = row && row.querySelector('.pm-badge');
+    return badge ? getComputedStyle(badge).color : null;
+  });
+  if (badgeInk !== 'rgb(0, 0, 0)') fail('El glifo de la cuenta no usa tinta oscura sobre un fondo claro: ' + badgeInk);
+  console.log('✔ La cuenta se agrega con un toque y el glifo elige tinta por contraste');
 
   await page.tap('.back');
   await page.waitForSelector('.tabbar [data-page="categorias"]', { timeout: 5000 });

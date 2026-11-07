@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Metría guarda datos financieros cifrados. No deben salir del teléfono por
+<!-- Metria guarda datos financieros cifrados. No deben salir del teléfono por
      respaldo en la nube ni por transferencia entre dispositivos: el usuario
      mueve sus datos con el respaldo cifrado de la app. -->
 <data-extraction-rules>

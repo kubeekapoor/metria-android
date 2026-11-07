@@ -1,6 +1,6 @@
 # Avisos de terceros
 
-Metría Android usa las siguientes dependencias. Cada una conserva su licencia
+Metria Android usa las siguientes dependencias. Cada una conserva su licencia
 original; este archivo es un resumen, no sustituye los textos completos que
 acompañan a cada paquete.
 
@@ -24,7 +24,7 @@ acompañan a cada paquete.
 
 ## Trabajo original
 
-`www/app.js`, `www/app.css`, `www/auth.css` y el diseño de Metría son obra de
+`www/app.js`, `www/app.css`, `www/auth.css` y el diseño de Metria son obra de
 Kubee Kapoor y se distribuyen en este repositorio bajo AGPL-3.0. La aplicación de
 escritorio es un proyecto separado.
 

@@ -268,7 +268,7 @@ public class MetriaBiometricPlugin extends Plugin {
 
     private BiometricPrompt.PromptInfo promptInfo() {
         return new BiometricPrompt.PromptInfo.Builder()
-                .setTitle("Desbloquear Metría")
+                .setTitle("Desbloquear Metria")
                 .setSubtitle("Usa tu huella o rostro")
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
                 .setNegativeButtonText("Usar contraseña")

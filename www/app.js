@@ -15,15 +15,37 @@ const CATEGORIES = [
 const catById = id => CATEGORIES.find(c => c.id === id);
 const CAPTURE_CATEGORIES = CATEGORIES.filter(c => c.id !== 'deuda' && c.id !== 'abono' && c.id !== 'transferencia' && c.id !== 'capital');
 
-const PM_COLORS = ['#4C6FFF','#18B47A','#F5A524','#F2555A','#8B5CF6','#14B8A6','#0EA5E9','#EC4899','#FFCC00','#64748B'];
+/* La paleta vive en design-tokens.css. Se lee como hex para guardar en el
+   data-store el mismo formato que usa el escritorio. */
+const PM_COLOR_TOKENS = [
+  '--account-color-1', '--account-color-2', '--account-color-3',
+  '--account-color-4', '--account-color-5', '--account-color-6',
+  '--account-color-7', '--account-color-8', '--account-color-9',
+  '--account-color-10',
+];
+const readCssToken = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const PM_COLORS = PM_COLOR_TOKENS.map(readCssToken).filter(Boolean);
+const PM_DEFAULT_COLOR = PM_COLORS[0] || readCssToken('--color-info');
 const PM_ICONS = [
   { id:'tarjeta', label:'Tarjeta', glyph:'▭' },
   { id:'billete', label:'Billete', glyph:'$' },
   { id:'cripto',  label:'Cripto',  glyph:'₿' },
   { id:'none',    label:'Sin ícono', glyph:'' },
 ];
-const pmColor = m => m.color || '#636366';
+const pmColor = m => m.color || PM_DEFAULT_COLOR;
 const pmGlyph = m => { const ic = PM_ICONS.find(i => i.id === m.icon); return ic ? ic.glyph : ''; };
+/* Elige tinta clara u oscura según la luminancia del color de cuenta. */
+function pmInk(color){
+  const match = /^#([0-9a-fA-F]{6})$/.exec(color || '');
+  if(!match) return 'var(--color-text-primary)';
+  const value = parseInt(match[1], 16);
+  const channel = shift => {
+    const c = ((value >> shift) & 255) / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  const luminance = 0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0);
+  return luminance > 0.179 ? 'var(--color-text-on-light-color)' : 'var(--color-text-on-dark-color)';
+}
 
 /* Categorías de ingreso y de gasto que el usuario administra. Cada movimiento guarda el NOMBRE de su
    categoría en el campo "detail" (así los reportes y los datos antiguos siguen funcionando). */
@@ -222,9 +244,9 @@ function renderConfirmModal(){
   if(!m) return '';
   const body = esc(m.text || '').replace(/\n/g, '<br>');
   const actions = m.alertOnly
-    ? `<button type="button" class="btn-save" style="--chip-color:#636366;" data-confirm-cancel>Entendido</button>`
+    ? `<button type="button" class="btn-save btn-secondary" data-confirm-cancel>Entendido</button>`
     : `<button type="button" class="btn-save" style="--chip-color:${m.safe ? 'var(--c-transferencia)' : 'var(--c-gasto)'};" data-confirm-ok>${esc(m.confirmLabel || 'Confirmar')}</button>
-       <button type="button" class="btn-save" style="--chip-color:#636366;" data-confirm-cancel>Cancelar</button>`;
+       <button type="button" class="btn-save btn-secondary" data-confirm-cancel>Cancelar</button>`;
   return `
   <div class="pm-modal-overlay">
     <div class="pm-modal-box">
@@ -267,7 +289,7 @@ function sanitizeBackup(p){
     pmIds.add(m.id);
     paymentMethods.push({
       id: m.id, name,
-      color: HEX_COLOR.test(m.color) ? m.color : '#636366',
+      color: HEX_COLOR.test(m.color) ? m.color : PM_DEFAULT_COLOR,
       icon: PM_ICONS.some(i => i.id === m.icon) ? m.icon : 'none',
       status: m.status === 'archived' ? 'archived' : 'active',
     });
@@ -435,7 +457,7 @@ function renderPwModal(){
         <p class="pm-modal-text" style="color:var(--c-gasto);min-height:18px;">${esc(m.error || '')}</p>
         <div class="pm-modal-actions">
           <button type="submit" class="btn-save" style="--chip-color:var(--c-transferencia);">${isExp ? 'Exportar' : 'Descifrar'}</button>
-          <button type="button" class="btn-save" style="--chip-color:#636366;" data-pw-cancel>Cancelar</button>
+          <button type="button" class="btn-save btn-secondary" data-pw-cancel>Cancelar</button>
         </div>
       </form>
     </div>
@@ -817,7 +839,7 @@ function renderPmCloseModal(){
       <p class="pm-modal-text">Esta cuenta tiene un saldo de ${fmt(0)}.<br><b>Los movimientos históricos no se eliminarán.</b></p>
       <div class="pm-modal-actions">
         <button type="button" class="btn-save" style="--chip-color:var(--c-gasto);" data-pmclose-confirmzero>Cerrar cuenta</button>
-        <button type="button" class="btn-save" style="--chip-color:#636366;" data-pmclose-cancel>Cancelar</button>
+        <button type="button" class="btn-save btn-secondary" data-pmclose-cancel>Cancelar</button>
       </div>`;
   } else if(modal.step === 'positive'){
     inner = `
@@ -828,7 +850,7 @@ function renderPmCloseModal(){
       <div class="pm-modal-actions">
         <button type="button" class="btn-save" style="--chip-color:var(--c-transferencia);" data-pmclose-transfer>Transferir saldo</button>
         <button type="button" class="btn-save" style="--chip-color:var(--c-gasto);" data-pmclose-remove>Eliminar saldo y cerrar</button>
-        <button type="button" class="btn-save" style="--chip-color:#636366;" data-pmclose-cancel>Cancelar</button>
+        <button type="button" class="btn-save btn-secondary" data-pmclose-cancel>Cancelar</button>
       </div>`;
   } else if(modal.step === 'transfer'){
     const destOptions = activePaymentMethods().filter(x => x.id !== modal.id).map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
@@ -840,7 +862,7 @@ function renderPmCloseModal(){
         <div class="field"><label>Selecciona la cuenta destino</label><select name="destino" required><option value="" disabled selected>Selecciona una cuenta</option>${destOptions}</select></div>
         <div class="pm-modal-actions">
           <button type="submit" class="btn-save" style="--chip-color:var(--c-transferencia);">Transferir y cerrar</button>
-          <button type="button" class="btn-save" style="--chip-color:#636366;" data-pmclose-back>Cancelar</button>
+          <button type="button" class="btn-save btn-secondary" data-pmclose-back>Cancelar</button>
         </div>
       </form>`;
   } else if(modal.step === 'removeConfirm'){
@@ -851,14 +873,14 @@ function renderPmCloseModal(){
       <p class="pm-modal-text">Este monto se eliminará junto con la cuenta: se registrará un gasto llamado <b>"Saldo descontado por cuenta eliminada"</b> por ${fmt(balance)}, cargado a "${esc(m.name)}".<br><b>Tus movimientos históricos no se eliminarán</b>, pero este dinero saldrá permanentemente de tu balance total.<br>Esta acción no se puede deshacer automáticamente.</p>
       <div class="pm-modal-actions">
         <button type="button" class="btn-save" style="--chip-color:var(--c-gasto);" data-pmclose-confirmremove>Confirmar y cerrar cuenta</button>
-        <button type="button" class="btn-save" style="--chip-color:#636366;" data-pmclose-back>Cancelar</button>
+        <button type="button" class="btn-save btn-secondary" data-pmclose-back>Cancelar</button>
       </div>`;
   } else if(modal.step === 'negative'){
     inner = `
       <p class="pm-modal-title">"${esc(m.name)}" tiene saldo negativo</p>
       <p class="pm-modal-text">Esta cuenta tiene un saldo negativo de ${fmt(balance)}.<br>Para cerrar la cuenta primero debes resolver el saldo pendiente.</p>
       <div class="pm-modal-actions">
-        <button type="button" class="btn-save" style="--chip-color:#636366;" data-pmclose-cancel>Cancelar</button>
+        <button type="button" class="btn-save btn-secondary" data-pmclose-cancel>Cancelar</button>
       </div>`;
   }
 
@@ -1009,7 +1031,7 @@ function renderWipeModal(){
       <p class="pm-modal-text">Esta acción es <b>permanente y no se puede deshacer</b>.<br>Se eliminarán todos tus movimientos, deudas y cuentas (activas y archivadas). La app quedará como si iniciara de cero.<br>Si quieres conservar algo, cancela y exporta un respaldo primero desde Inicio → Respaldo.</p>
       <div class="pm-modal-actions">
         <button type="button" class="btn-save" style="--chip-color:var(--c-gasto);" data-wipe-confirm>Borrar</button>
-        <button type="button" class="btn-save" style="--chip-color:#636366;" data-wipe-cancel>Cancelar</button>
+        <button type="button" class="btn-save btn-secondary" data-wipe-cancel>Cancelar</button>
       </div>
     </div>
   </div>`;
@@ -1156,7 +1178,7 @@ function renderEntryEditForm(entry){
       <div class="field"><label>Cuenta disponible</label><select name="paymentMethod" required>${state.paymentMethods.map(m=>`<option value="${m.id}" ${m.id===entry.paymentMethod?'selected':''} ${m.status==='archived' && m.id!==entry.paymentMethod?'disabled':''}>${paymentMethodName(m.id)}</option>`).join('')}</select></div>
       <div style="display:flex;gap:10px;">
         <button type="submit" class="btn-save" style="--chip-color:var(--c-abono)">Guardar</button>
-        <button type="button" class="btn-save" data-entrycancel style="--chip-color:#636366;">Cancelar</button>
+        <button type="button" class="btn-save btn-secondary" data-entrycancel>Cancelar</button>
       </div>
     </form>`;
   }
@@ -1170,7 +1192,7 @@ function renderEntryEditForm(entry){
     ${showPM ? `<div class="field"><label>Cuenta disponible</label><select name="paymentMethod" required>${state.paymentMethods.map(m=>`<option value="${m.id}" ${m.id===entry.paymentMethod?'selected':''} ${m.status==='archived' && m.id!==entry.paymentMethod?'disabled':''}>${paymentMethodName(m.id)}</option>`).join('')}</select></div>` : ''}
     <div style="display:flex;gap:10px;">
       <button type="submit" class="btn-save" style="--chip-color:${cat.color}">Guardar</button>
-      <button type="button" class="btn-save" data-entrycancel style="--chip-color:#636366;">Cancelar</button>
+      <button type="button" class="btn-save btn-secondary" data-entrycancel>Cancelar</button>
     </div>
   </form>`;
 }
@@ -1253,7 +1275,7 @@ function renderTransferEditForm(entry){
     <div class="field"><label>Fecha</label><input type="date" name="fecha" value="${entry.date}"></div>
     <div style="display:flex;gap:10px;">
       <button type="submit" class="btn-save" style="--chip-color:var(--c-transferencia)">Guardar</button>
-      <button type="button" class="btn-save" data-transfercancel style="--chip-color:#636366;">Cancelar</button>
+      <button type="button" class="btn-save btn-secondary" data-transfercancel>Cancelar</button>
     </div>
   </form>`;
 }
@@ -1616,7 +1638,7 @@ function renderCifra(){
     <div class="sheet" role="dialog" aria-label="${esc(title)}"><div class="sheet-grab"></div><p class="sheet-title">${esc(title)}</p>
       ${body}
       <p class="hint" style="margin:10px 0 14px;">${note}</p>
-      <button type="button" class="btn-save" data-cifra-close style="--chip-color:#636366;">Cerrar</button></div>`;
+      <button type="button" class="btn-save btn-secondary" data-cifra-close>Cerrar</button></div>`;
 }
 function renderSheet(){
   if(!state.sheet) return '';
@@ -1698,7 +1720,7 @@ function renderHome(){
         const c = catById(e.type), pm = e.paymentMethod ? paymentMethodName(e.paymentMethod) : '';
         const s = c ? c.sign : 0, out = s < 0;
         const tint = c ? c.color : 'var(--accent)';
-        return `<div class="rec"><span class="ri" style="background:color-mix(in srgb, ${tint} 16%, var(--card-alt));border-color:color-mix(in srgb, ${tint} 22%, var(--line));color:${tint}">${ic(ENTRY_ICON[e.type] || 'receipt')}</span>
+        return `<div class="rec"><span class="ri" style="color:${tint}">${ic(ENTRY_ICON[e.type] || 'receipt')}</span>
           <span class="rm"><div class="rt">${esc(e.detail || (c ? c.label : ''))}</div><div class="rs">${fmtDate(e.date)} · ${pm || (c ? c.label : '')}</div></span>
           <span class="ra ${out ? 'out' : ''}">${s > 0 ? '+' : s < 0 ? '-' : ''}${mny(e.amount)}</span></div>`;
       }).join('') : `<div class="empty">Aún no hay movimientos. Toca + para registrar el primero.</div>`}
@@ -1732,7 +1754,7 @@ function renderCuentas(){
       <p class="hint" style="margin-top:2px;">Las cuentas en negativo se muestran en 0% para no distorsionar la gráfica.</p>
     </div>` : ''}
     <div class="panel">
-      <p class="panel-title"><span class="dot" style="background:#636366"></span>Agregar cuenta disponible</p>
+      <p class="panel-title"><span class="dot" style="background:var(--color-text-muted)"></span>Agregar cuenta disponible</p>
       <form id="pm-form">
         <div class="field"><label>Nombre</label><input type="text" name="name" placeholder="Ej. Tarjeta BBVA" required value="${esc(state.newPmName || '')}"></div>
         <div class="field"><label>Balance actual de la cuenta</label><input type="number" name="capital" step="0.01" min="0" inputmode="decimal" placeholder="0.00" required value="${esc(state.newPmCapital || '')}"></div>
@@ -1750,13 +1772,13 @@ function renderCuentas(){
             <div class="field"><label>Ícono</label>${pmIconPicker(state.editPmIcon, 'selectEditPmIcon')}</div>
             <div style="display:flex;gap:10px;">
               <button type="submit" class="btn-save" style="--chip-color:${state.editPmColor};">Guardar</button>
-              <button type="button" class="btn-save" data-pmcancel style="--chip-color:#636366;">Cancelar</button>
+              <button type="button" class="btn-save btn-secondary" data-pmcancel>Cancelar</button>
             </div>
           </form>`;
         }
         return `
         <div class="entry-row">
-          <span class="pm-badge" style="background:${m.color}">${pmGlyph({icon:m.icon})}</span>
+          <span class="pm-badge" style="background:${m.color};color:${pmInk(m.color)}">${pmGlyph({icon:m.icon})}</span>
           <div class="entry-main">
             <div class="entry-detail">${esc(m.name)}</div>
             <div class="entry-meta" style="color:${m.balance>=0?'var(--ink-faint)':'var(--c-gasto)'}">${fmt(m.balance)}</div>
@@ -1868,7 +1890,7 @@ function renderCatAdmin(){
         <p class="hint" style="margin:-4px 0 12px;">Al renombrarla, también cambia en los movimientos que ya la usan.</p>
         <div style="display:flex;gap:10px;">
           <button type="submit" class="btn-save" style="--chip-color:${kindColor};">Guardar</button>
-          <button type="button" class="btn-save" data-catcancel style="--chip-color:#636366;">Cancelar</button>
+          <button type="button" class="btn-save btn-secondary" data-catcancel>Cancelar</button>
         </div>
       </form>`;
     }
@@ -2033,14 +2055,14 @@ function renderAjustes(){
     </div>
     <p class="section-label">Respaldo</p>
     <div class="panel" style="display:flex;gap:10px;">
-      <button type="button" class="btn-save" id="export-btn" style="--chip-color:#636366;">Exportar</button>
-      <button type="button" class="btn-save" id="import-btn" style="--chip-color:#636366;">Importar</button>
+      <button type="button" class="btn-save btn-secondary" id="export-btn">Exportar</button>
+      <button type="button" class="btn-save btn-secondary" id="import-btn">Importar</button>
       <input type="file" id="import-file" accept="application/json" style="display:none;">
     </div>
     <p class="hint" style="margin:0 20px 10px;">Guarda un archivo cifrado con una contraseña que tú eliges, por si cambias de computadora o pierdes tus datos.</p>
 
     <div class="panel">
-      <p class="panel-title"><span class="dot" style="background:#636366"></span>Acerca de</p>
+      <p class="panel-title"><span class="dot" style="background:var(--color-text-muted)"></span>Acerca de</p>
       <p class="hint" id="app-version" style="margin:0;">Metria${appVersion ? ' v' + esc(appVersion) : ''}</p>
     </div>
     <div class="panel">
@@ -2194,7 +2216,7 @@ function renderDebtEditForm(d){
     <div class="field"><label>Fecha</label><input type="date" name="fecha" value="${d.date}"></div>
     <div style="display:flex;gap:10px;">
       <button type="submit" class="btn-save" style="--chip-color:var(--c-deuda)">Guardar</button>
-      <button type="button" class="btn-save" data-debtcancel style="--chip-color:#636366;">Cancelar</button>
+      <button type="button" class="btn-save btn-secondary" data-debtcancel>Cancelar</button>
     </div>
   </form>`;
 }
@@ -2226,7 +2248,7 @@ function renderDeudasLiquidadas(){
 
   return `
     ${renderTopbar('Deudas liquidadas', true)}
-    <div class="balance-panel" style="border-color:color-mix(in srgb, var(--c-liquidada) 26%, var(--line));">
+    <div class="balance-panel">
       <div class="balance-label" style="color:var(--c-liquidada);">Total de deudas liquidadas</div>
       <div class="balance-figure">${fmt(total)}</div>
       <div class="balance-sub">${liquidated.length} deuda${liquidated.length===1?'':'s'} liquidada${liquidated.length===1?'':'s'}</div>
@@ -2557,7 +2579,7 @@ function renderResumen(){
       ${Object.entries(ccByMethod).map(([pmId, amt]) => {
         const pmObj = state.paymentMethods.find(m => m.id === pmId);
         return `<div class="stat-row" style="padding:8px 0;">
-          <span class="k" style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:${pmObj?pmColor(pmObj):'#636366'};"></span>${pmObj?esc(pmObj.name)+(pmObj.status==='archived'?' · Cuenta archivada':''):'Cuenta eliminada'}</span>
+          <span class="k" style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:${pmObj?pmColor(pmObj):'var(--color-text-muted)'};"></span>${pmObj?esc(pmObj.name)+(pmObj.status==='archived'?' · Cuenta archivada':''):'Cuenta eliminada'}</span>
           <span class="v">${fmt(amt)}</span>
         </div>`;
       }).join('')}

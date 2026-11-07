@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Metría</string>
-    <string name="title_activity_main">Metría</string>
+    <string name="app_name">Metria</string>
+    <string name="title_activity_main">Metria</string>
     <string name="package_name">com.kubeekapoor.metria</string>
     <string name="custom_url_scheme">com.kubeekapoor.metria</string>
 </resources>

@@ -1,6 +1,6 @@
 {
   "appId": "com.kubeekapoor.metria",
-  "appName": "Metría",
+  "appName": "Metria",
   "webDir": "www",
   "loggingBehavior": "none",
   "android": {

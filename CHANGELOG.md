@@ -1,6 +1,30 @@
-# Changelog — Metría Android
+# Changelog — Metria Android
 
 Formato: `YYYY-MM-DD · área · cambio`.
+
+## [1.2.2] — 2026-11-06
+
+### Accesibilidad y sistema de diseño (Tanda C)
+- Se retiraron `color-mix()`, `backdrop-filter` y las transparencias decorativas
+  de `app.css` y `auth.css`; las superficies, el scrim y los anillos de foco usan
+  tokens sólidos.
+- Ningún texto funcional queda por debajo de 12 px.
+- La leyenda inferior y las etiquetas de la barra y de las gráficas suben a 12 px
+  y dejan de usar opacidad para simular color.
+- La paleta de cuentas vive en `design-tokens.css` (`--account-color-1…10`).
+- El glifo de las cuentas elige tinta clara u oscura según la luminancia del
+  color de fondo y cumple contraste.
+- Los botones secundarios usan la clase `btn-secondary` en vez de un color
+  literal embebido en el atributo `style`.
+
+### Nombre y limpieza
+- El nombre visible pasa a «Metria» (D-18) en el lanzador, Capacitor y
+  documentación. El DN del certificado no cambia.
+- Se eliminaron los vectores de plantilla sin usar del icono.
+- Nueva prueba de sincronización de versión, etiqueta e iconos.
+
+### Versión
+- `versionName 1.2.2`, `versionCode 5`.
 
 ## [1.2.1] — 2026-11-06
 
@@ -49,7 +73,7 @@ Formato: `YYYY-MM-DD · área · cambio`.
 - Plugin nativo `MetriaBiometric` + `androidx.biometric:biometric:1.1.0`.
 - La llave maestra se cifra con AES-256-GCM usando una llave del Android
   Keystore que exige `BIOMETRIC_STRONG`; la contraseña nunca se guarda.
-- La llave se invalida si se inscribe una biometría nueva; Metría desactiva el
+- La llave se invalida si se inscribe una biometría nueva; Metria desactiva el
   acceso y pide la contraseña.
 - Botón “Desbloquear con huella o rostro” en la pantalla de acceso y apertura
   automática del diálogo al bloquear.
